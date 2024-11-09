@@ -39,15 +39,3 @@ import AppHeader from '../../components/AppHeader.vue';
     </div>
   </div>
 </template>
-
-<style>
-/* タップ時のハイライトを無効化 */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* スムーズスクロール */
-html {
-  scroll-behavior: smooth;
-}
-</style>

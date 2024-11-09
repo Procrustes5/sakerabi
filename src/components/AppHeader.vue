@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Bell, Search } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
 
 interface Notification {
   id: string;
@@ -9,6 +10,8 @@ interface Notification {
   timestamp: Date;
   read: boolean;
 }
+
+const router = useRouter();
 
 const hasNotification = ref(true);  // 通知の有無を制御
 const isScrolled = ref(false);
@@ -29,6 +32,11 @@ const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value;
   emit('search');
 };
+
+const handleClick = () => {
+  router.push('/');
+};
+
 // スクロール位置に応じてヘッダーの見た目を変更
 if (typeof window !== 'undefined') {
   window.addEventListener('scroll', () => {
@@ -49,7 +57,7 @@ if (typeof window !== 'undefined') {
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- ロゴ部分 -->
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2" @click="handleClick">
           <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
             <div class="text-white font-bold text-lg transform hover:scale-110 transition-transform duration-300">
               S
