@@ -8,10 +8,11 @@ const router = useRouter()
 
 onMounted(() => {
   // 認証状態の変更を監視
-  supabase.auth.onAuthStateChange((event) => {
+  supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       router.push('/welcome')
-    } else if (event === 'SIGNED_IN') {
+    } else if (event === 'SIGNED_IN' && router.currentRoute.value.path === '/welcome') {
+      // welcomeページにいる場合のみホームにリダイレクト
       router.push('/')
     }
   })

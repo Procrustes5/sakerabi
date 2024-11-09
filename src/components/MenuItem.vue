@@ -12,6 +12,8 @@ const router = useRouter();
 const handleClick = () => {
   if (props.title === 'イベント') {
     router.push('/events');
+  } else if (props.title === '設定') {
+    router.push('/settings');
   }
 };
 </script>
