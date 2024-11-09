@@ -1,10 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue'
 import { Bell, Search } from 'lucide-vue-next';
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
 
 const hasNotification = ref(true);  // 通知の有無を制御
 const isScrolled = ref(false);
 
+const emit = defineEmits<{
+  'search': []
+  'notification': []
+}>();
+
+// 検索モーダルの状態管理
+const isSearchOpen = ref(false);
+const notifications = ref<Notification[]>([]);
+
+const unreadCount = computed(() =>
+  notifications.value.filter(n => !n.read).length
+);
+const toggleSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value;
+  emit('search');
+};
 // スクロール位置に応じてヘッダーの見た目を変更
 if (typeof window !== 'undefined') {
   window.addEventListener('scroll', () => {
@@ -56,7 +80,7 @@ if (typeof window !== 'undefined') {
   </header>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 /* ロゴのテキストにシャドウ効果を追加 */
 h1 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
