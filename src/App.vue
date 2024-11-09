@@ -1,5 +1,21 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase } from './utils/supabase'
+
+const router = useRouter()
+
+onMounted(() => {
+  // 認証状態の変更を監視
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      router.push('/welcome')
+    } else if (event === 'SIGNED_IN') {
+      router.push('/')
+    }
+  })
+})
 </script>
 
 <template>

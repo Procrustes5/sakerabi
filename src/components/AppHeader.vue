@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { Bell, Search } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
+import Logo from '../assets/logo.svg';
 
 interface Notification {
   id: string;
@@ -58,10 +59,12 @@ if (typeof window !== 'undefined') {
       <div class="flex items-center justify-between h-16">
         <!-- ロゴ部分 -->
         <div class="flex items-center space-x-2" @click="handleClick">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
-            <div class="text-white font-bold text-lg transform hover:scale-110 transition-transform duration-300">
-              S
-            </div>
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+            <img
+              :src="Logo"
+              alt="Sakerabi Logo"
+              class="w-8 h-8 text-white transform hover:scale-110 transition-transform duration-300"
+            />
           </div>
           <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
             sakerabi
