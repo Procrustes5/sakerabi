@@ -11,7 +11,7 @@ export const useAuth = () => {
     try {
       loading.value = true
       error.value = null
-
+      console.log(window.location.origin)
       const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
