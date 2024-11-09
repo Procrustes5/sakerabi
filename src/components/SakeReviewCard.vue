@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Heart, MessageCircle, Share2, MapPin, Calendar } from 'lucide-vue-next';
+import UserAvatar from './UserAvatar.vue';
 
 interface SakeReview {
   id: string;
-  userImage: string;
+  userImage?: string;
   userName: string;
   timestamp: string;
   sakeName: string;
@@ -41,11 +42,11 @@ const handleLike = () => {
   <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
     <!-- ユーザー情報 -->
     <div class="p-4 flex items-center space-x-3">
-      <img
-        :src="review.userImage"
-        :alt="review.userName"
-        class="w-10 h-10 rounded-full object-cover"
-      >
+      <UserAvatar
+        :image="review.userImage"
+        :name="review.userName"
+        size="md"
+      />
       <div class="flex-1">
         <h3 class="font-semibold text-gray-900">{{ review.userName }}</h3>
         <p class="text-xs text-gray-500">{{ review.timestamp }}</p>
@@ -119,16 +120,3 @@ const handleLike = () => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.like-button-enter-active,
-.like-button-leave-active {
-  transition: all 0.3s ease;
-}
-
-.like-button-enter-from,
-.like-button-leave-to {
-  transform: scale(0.5);
-  opacity: 0;
-}
-</style>
