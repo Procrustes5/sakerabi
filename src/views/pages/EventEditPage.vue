@@ -124,7 +124,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-6">
+  <div class="max-w-2xl mx-auto bg-gray-50 px-4 py-6">
     <button
       @click="goBack"
       class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
@@ -141,7 +141,7 @@ onMounted(() => {
       :onRetry="fetchEvent"
     />
 
-    <div v-else class="bg-white rounded-xl shadow-sm p-6">
+    <div v-else class="bg-white rounded-xl shadow-md p-6">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">イベントを編集</h1>
         <button
@@ -163,7 +163,7 @@ onMounted(() => {
             v-model="form.name"
             type="text"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -176,7 +176,7 @@ onMounted(() => {
             v-model="form.date"
             type="date"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -189,7 +189,7 @@ onMounted(() => {
             v-model="form.location"
             type="text"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -202,7 +202,7 @@ onMounted(() => {
             v-model="form.description"
             required
             rows="4"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 

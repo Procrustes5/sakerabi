@@ -55,7 +55,7 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-6">
+  <div class="max-w-2xl mx-auto bg-gray-50 px-4 py-6">
     <button
       @click="goBack"
       class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
@@ -64,7 +64,7 @@ const goBack = () => {
       <span>戻る</span>
     </button>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="bg-white rounded-xl shadow-md p-6">
       <h1 class="text-2xl font-bold text-gray-900 mb-6">新しいイベントを作成</h1>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -77,7 +77,7 @@ const goBack = () => {
             v-model="form.name"
             type="text"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -90,7 +90,7 @@ const goBack = () => {
             v-model="form.date"
             type="date"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -103,7 +103,7 @@ const goBack = () => {
             v-model="form.location"
             type="text"
             required
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 
@@ -116,7 +116,7 @@ const goBack = () => {
             v-model="form.description"
             required
             rows="4"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
           />
         </div>
 

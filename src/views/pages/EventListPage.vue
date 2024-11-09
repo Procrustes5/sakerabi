@@ -29,7 +29,6 @@ const fetchEvents = async () => {
     const { data, error } = await supabase
       .from('events')
       .select('*')
-      .order('date', { ascending: true });
 
     if (error) throw error;
     events.value = data;
@@ -60,16 +59,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-3xl mx-auto px-4 bg-gray-50 min-h-screen">
+  <div class="max-w-3xl mx-auto bg-gray-50 min-h-screen">
     <AppHeader />
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6 px-4">
       <h1 class="text-2xl font-bold text-gray-900">開催予定のイベント</h1>
       <button
         @click="navigateToCreate"
         class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-colors"
       >
         <Plus class="w-5 h-5" />
-        <span>イベントを作成</span>
+        <span>作成</span>
       </button>
     </div>
 
@@ -85,11 +84,12 @@ onMounted(() => {
       <p class="text-gray-500">開催予定のイベントはありません</p>
     </div>
 
-    <div v-else class="space-y-4">
+    <div v-else class="space-y-4 px-4">
       <div
         v-for="event in events"
         :key="event.id"
         class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+        @click="router.push(`/events/${event.id}/edit`)"
       >
         <div class="flex items-start justify-between">
           <div>

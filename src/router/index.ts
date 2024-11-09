@@ -27,13 +27,12 @@ const router = createRouter({
       name: 'event-create',
       component: EventCreateView,
     },
-    // イベント編集ページを追加する場合
-    // {
-    //   path: '/events/:id/edit',
-    //   name: 'event-edit',
-    //   component: () => import('../views/pages/EventEditView.vue'),
-    //   props: true
-    // },
+    {
+      path: '/events/:id/edit',
+      name: 'event-edit',
+      component: () => import('../views/pages/EventEditPage.vue'),
+      props: true
+    },
   ],
 })
 
