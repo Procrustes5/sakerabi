@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useDailyRecommend } from '@/composables/useDailyRecommend';
-import LoadingSpinner from './LoadingSpinner.vue';
-import ErrorDisplay from './ErrorDisplay.vue';
-import FlavorTags from './FlavorTags.vue';
-import FlavorChart from './FlavorChart.vue';
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useDailyRecommend } from '@/composables/useDailyRecommend'
+import LoadingSpinner from './LoadingSpinner.vue'
+import ErrorDisplay from './ErrorDisplay.vue'
+import FlavorTags from './FlavorTags.vue'
+import FlavorChart from './FlavorChart.vue'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const {
   brands,
@@ -16,76 +16,72 @@ const {
   nextSlide,
   prevSlide,
   setCurrentIndex,
-  retryLoad
-} = useDailyRecommend();
+  retryLoad,
+} = useDailyRecommend()
 
 // 自動再生の制御
-const autoplayInterval = ref<number | null>(null);
+const autoplayInterval = ref<number | null>(null)
 
 const startAutoplay = () => {
-  stopAutoplay();
-  autoplayInterval.value = window.setInterval(nextSlide, 5000);
-};
+  stopAutoplay()
+  autoplayInterval.value = window.setInterval(nextSlide, 5000)
+}
 
 const stopAutoplay = () => {
   if (autoplayInterval.value) {
-    clearInterval(autoplayInterval.value);
-    autoplayInterval.value = null;
+    clearInterval(autoplayInterval.value)
+    autoplayInterval.value = null
   }
-};
+}
 
 // スワイプ関連の状態と処理
-const touchStart = ref(0);
-const touchEnd = ref(0);
-const isSwiping = ref(false);
+const touchStart = ref(0)
+const touchEnd = ref(0)
+const isSwiping = ref(false)
 
 const handleTouchStart = (e: TouchEvent) => {
-  touchStart.value = e.touches[0].clientX;
-  isSwiping.value = true;
-  stopAutoplay();
-};
+  touchStart.value = e.touches[0].clientX
+  isSwiping.value = true
+  stopAutoplay()
+}
 
 const handleTouchMove = (e: TouchEvent) => {
-  if (!isSwiping.value) return;
-  touchEnd.value = e.touches[0].clientX;
-};
+  if (!isSwiping.value) return
+  touchEnd.value = e.touches[0].clientX
+}
 
 const handleTouchEnd = () => {
-  isSwiping.value = false;
-  const swipeDistance = touchEnd.value - touchStart.value;
+  isSwiping.value = false
+  const swipeDistance = touchEnd.value - touchStart.value
   if (Math.abs(swipeDistance) > 50) {
     if (swipeDistance > 0) {
-      prevSlide();
+      prevSlide()
     } else {
-      nextSlide();
+      nextSlide()
     }
   }
-  startAutoplay();
-};
+  startAutoplay()
+}
 
 // コンポーネントのライフサイクル
 onMounted(() => {
   fetchDailyRecommends().then(() => {
     if (brands.value.length > 0) {
-      startAutoplay();
+      startAutoplay()
     }
-  });
-});
+  })
+})
 
 onUnmounted(() => {
-  stopAutoplay();
-});
+  stopAutoplay()
+})
 </script>
 
 <template>
   <div class="aspect-square overflow-hidden rounded-xl shadow-sm bg-white relative">
     <LoadingSpinner v-if="isLoading" />
 
-    <ErrorDisplay
-      v-else-if="loadError"
-      :message="loadError"
-      :onRetry="retryLoad"
-    />
+    <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="retryLoad" />
 
     <div
       v-else-if="brands.length > 0"
@@ -99,7 +95,7 @@ onUnmounted(() => {
         class="flex h-full transition-transform duration-300 ease-in-out"
         :style="{
           transform: `translateX(-${currentIndex * 100}%)`,
-          width: `${brands.length * 100}%`
+          width: `${brands.length * 100}%`,
         }"
       >
         <div
@@ -115,7 +111,9 @@ onUnmounted(() => {
           <!-- メインコンテンツ -->
           <div class="relative w-full h-full">
             <!-- 日本酒アイコン -->
-            <div class="absolute bottom-1/3 left-32 flex items-center justify-center pointer-events-none">
+            <div
+              class="absolute bottom-1/3 left-32 flex items-center justify-center pointer-events-none"
+            >
               <div class="sake-icon text-8xl text-white">🍶</div>
             </div>
             <!-- フレーバーチャートとタグ -->
@@ -129,10 +127,10 @@ onUnmounted(() => {
             </div>
 
             <!-- タイトルと説明 -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-              <h2 class="text-white text-xl font-bold mb-2">
-                本日のおすすめ
-              </h2>
+            <div
+              class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent"
+            >
+              <h2 class="text-white text-xl font-bold mb-2">本日のおすすめ</h2>
               <p class="text-white/90 text-lg mb-4">{{ brand.name }}</p>
             </div>
           </div>
@@ -175,8 +173,11 @@ onUnmounted(() => {
 
 <style scoped>
 .bg-pattern {
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.15) 1px,
+    transparent 0
+  );
   background-size: 20px 20px;
 }
 

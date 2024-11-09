@@ -1,72 +1,68 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { ArrowLeft, Trash2 } from 'lucide-vue-next';
-import LoadingSpinner from '../../components/LoadingSpinner.vue';
-import ErrorDisplay from '../../components/ErrorDisplay.vue';
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { ArrowLeft, Trash2 } from 'lucide-vue-next'
+import LoadingSpinner from '../../components/LoadingSpinner.vue'
+import ErrorDisplay from '../../components/ErrorDisplay.vue'
 import { supabase } from '@/utils/supabase'
 
 interface EventForm {
-  name: string;
-  date: string;
-  location: string;
-  description: string;
+  name: string
+  date: string
+  location: string
+  description: string
 }
 
 const props = defineProps<{
-  id: string;
-}>();
+  id: string
+}>()
 
-const router = useRouter();
-const route = useRoute();
-const isLoading = ref(true);
-const isSubmitting = ref(false);
-const loadError = ref<string | null>(null);
-const submitError = ref<string | null>(null);
-const showDeleteConfirm = ref(false);
+const router = useRouter()
+const route = useRoute()
+const isLoading = ref(true)
+const isSubmitting = ref(false)
+const loadError = ref<string | null>(null)
+const submitError = ref<string | null>(null)
+const showDeleteConfirm = ref(false)
 
 const form = ref<EventForm>({
   name: '',
   date: '',
   location: '',
-  description: ''
-});
+  description: '',
+})
 
 // イベント情報の取得
 const fetchEvent = async () => {
-  isLoading.value = true;
-  loadError.value = null;
+  isLoading.value = true
+  loadError.value = null
 
   try {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('id', props.id)
-      .single();
+    const { data, error } = await supabase.from('events').select('*').eq('id', props.id).single()
 
-    if (error) throw error;
-    if (!data) throw new Error('イベントが見つかりません');
+    if (error) throw error
+    if (!data) throw new Error('イベントが見つかりません')
 
     form.value = {
       name: data.name,
       date: data.date,
       location: data.location,
-      description: data.description
-    };
+      description: data.description,
+    }
   } catch (error) {
-    loadError.value = 'イベント情報の取得に失敗しました。';
-    console.error('Error fetching event:', error);
+    loadError.value = 'イベント情報の取得に失敗しました。'
+    console.error('Error fetching event:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 // 更新の実行
 const handleSubmit = async () => {
-  if (isSubmitting.value) return;
+  if (isSubmitting.value) return
 
-  isSubmitting.value = true;
-  submitError.value = null;
+  isSubmitting.value = true
+  submitError.value = null
 
   try {
     const { error } = await supabase
@@ -77,69 +73,59 @@ const handleSubmit = async () => {
         location: form.value.location,
         description: form.value.description,
       })
-      .eq('id', props.id);
+      .eq('id', props.id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    router.push('/events');
+    router.push('/events')
   } catch (error) {
-    submitError.value = 'イベントの更新に失敗しました。';
-    console.error('Error updating event:', error);
+    submitError.value = 'イベントの更新に失敗しました。'
+    console.error('Error updating event:', error)
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 
 // 削除の実行
 const handleDelete = async () => {
-  if (isSubmitting.value) return;
+  if (isSubmitting.value) return
 
-  isSubmitting.value = true;
-  submitError.value = null;
+  isSubmitting.value = true
+  submitError.value = null
 
   try {
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', props.id);
+    const { error } = await supabase.from('events').delete().eq('id', props.id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    router.push('/events');
+    router.push('/events')
   } catch (error) {
-    submitError.value = 'イベントの削除に失敗しました。';
-    console.error('Error deleting event:', error);
+    submitError.value = 'イベントの削除に失敗しました。'
+    console.error('Error deleting event:', error)
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 
 const goBack = () => {
-  router.back();
-};
+  router.back()
+}
 
 onMounted(() => {
-  fetchEvent();
-});
+  fetchEvent()
+})
 </script>
 
 <template>
   <div class="max-w-2xl mx-auto bg-gray-50 px-4 py-6">
-    <button
-      @click="goBack"
-      class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
-    >
+    <button @click="goBack" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6">
       <ArrowLeft class="w-5 h-5" />
       <span>戻る</span>
     </button>
 
     <LoadingSpinner v-if="isLoading" />
 
-    <ErrorDisplay
-      v-else-if="loadError"
-      :message="loadError"
-      :onRetry="fetchEvent"
-    />
+    <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="fetchEvent" />
 
     <div v-else class="bg-white rounded-xl shadow-md p-6">
       <div class="flex justify-between items-center mb-6">
@@ -168,9 +154,7 @@ onMounted(() => {
         </div>
 
         <div>
-          <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
-            開催日 *
-          </label>
+          <label for="date" class="block text-sm font-medium text-gray-700 mb-1"> 開催日 * </label>
           <input
             id="date"
             v-model="form.date"
@@ -228,12 +212,8 @@ onMounted(() => {
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     >
       <div class="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">
-          イベントを削除しますか？
-        </h3>
-        <p class="text-gray-600 mb-6">
-          この操作は取り消すことができません。
-        </p>
+        <h3 class="text-xl font-bold text-gray-900 mb-4">イベントを削除しますか？</h3>
+        <p class="text-gray-600 mb-6">この操作は取り消すことができません。</p>
         <div class="flex justify-end gap-4">
           <button
             @click="showDeleteConfirm = false"

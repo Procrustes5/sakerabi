@@ -30,9 +30,7 @@ const handleLoginClick = async () => {
       <!-- Start Button -->
       <div class="w-full max-w-xs">
         <button
-          class="w-full bg-white rounded-full py-4 px-8 text-indigo-600 font-medium
-                 shadow-lg transform transition duration-200 hover:scale-105
-                 active:scale-95 focus:outline-none"
+          class="w-full bg-white rounded-full py-4 px-8 text-indigo-600 font-medium shadow-lg transform transition duration-200 hover:scale-105 active:scale-95 focus:outline-none"
           @click="handleLoginClick"
           :disabled="loading"
         >
@@ -68,7 +66,9 @@ const handleLoginClick = async () => {
         <div class="mt-8 flex justify-center space-x-4">
           <a href="/help" class="text-indigo-100 text-sm hover:text-white transition">ヘルプ</a>
           <span class="text-indigo-200">|</span>
-          <a href="/privacy" class="text-indigo-100 text-sm hover:text-white transition">プライバシー</a>
+          <a href="/privacy" class="text-indigo-100 text-sm hover:text-white transition"
+            >プライバシー</a
+          >
         </div>
       </div>
     </div>

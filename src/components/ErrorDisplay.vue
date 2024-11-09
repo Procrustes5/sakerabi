@@ -1,9 +1,9 @@
 <!-- src/components/ErrorDisplay.vue -->
 <script setup lang="ts">
 defineProps<{
-  message: string;
-  onRetry: () => void;
-}>();
+  message: string
+  onRetry: () => void
+}>()
 </script>
 
 <template>

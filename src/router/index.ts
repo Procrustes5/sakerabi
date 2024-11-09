@@ -13,38 +13,38 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomePage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/welcome',
       name: 'welcome',
       component: WelcomePage,
-      meta: { requiresUnauth: true }
+      meta: { requiresUnauth: true },
     },
     {
       path: '/events',
       name: 'events',
       component: EventListView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/events/create',
       name: 'event-create',
       component: EventCreateView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/events/:id/edit',
       name: 'event-edit',
       component: () => import('../views/pages/EventEditPage.vue'),
       props: true,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/settings',
       name: 'settings',
       component: SettingsPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
   ],
 })
@@ -52,7 +52,9 @@ const router = createRouter({
 // ナビゲーションガード
 router.beforeEach(async (to) => {
   // セッションチェック
-  const { data: { session } } = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
   const isAuthenticated = !!session
 
   // ルートがログインが必要で、未認証の場合

@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Calendar } from 'lucide-vue-next';
+import { ref, onMounted } from 'vue'
+import { Calendar } from 'lucide-vue-next'
 import { supabase } from '@/utils/supabase'
 
 interface Event {
-  id: number;
-  name: string;
-  date: string;
-  location: string;
+  id: number
+  name: string
+  date: string
+  location: string
 }
 
-const upcomingEvent = ref<Event | null>(null);
-const isLoading = ref(true);
-const error = ref<string | null>(null);
+const upcomingEvent = ref<Event | null>(null)
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 
 const fetchUpcomingEvent = async () => {
-  isLoading.value = true;
-  error.value = null;
+  isLoading.value = true
+  error.value = null
 
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0]
 
     const { data, error: supabaseError } = await supabase
       .from('events')
@@ -27,31 +27,31 @@ const fetchUpcomingEvent = async () => {
       .gte('date', today)
       .order('date', { ascending: true })
       .limit(1)
-      .single();
+      .single()
 
-    if (supabaseError) throw supabaseError;
-    upcomingEvent.value = data;
+    if (supabaseError) throw supabaseError
+    upcomingEvent.value = data
   } catch (err) {
-    console.error('Error fetching upcoming event:', err);
-    error.value = '次回イベントの取得に失敗しました';
+    console.error('Error fetching upcoming event:', err)
+    error.value = '次回イベントの取得に失敗しました'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const formatDateTime = (dateStr: string) => {
-  const date = new Date(dateStr);
+  const date = new Date(dateStr)
   return new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     weekday: 'short',
-  }).format(date);
-};
+  }).format(date)
+}
 
 onMounted(() => {
-  fetchUpcomingEvent();
-});
+  fetchUpcomingEvent()
+})
 </script>
 
 <template>

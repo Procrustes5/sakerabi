@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DailyRecommend from '../../components/DailyRecommend.vue';
-import NextEvent from '../../components/NextEvent.vue';
-import MenuGrid from '../../components/MenuGrid.vue';
-import Timeline from '../../components/Timeline.vue';
-import AppHeader from '../../components/AppHeader.vue';
+import DailyRecommend from '../../components/DailyRecommend.vue'
+import NextEvent from '../../components/NextEvent.vue'
+import MenuGrid from '../../components/MenuGrid.vue'
+import Timeline from '../../components/Timeline.vue'
+import AppHeader from '../../components/AppHeader.vue'
 </script>
 
 <template>
@@ -12,11 +12,7 @@ import AppHeader from '../../components/AppHeader.vue';
 
     <!-- 今日のおすすめ -->
     <div class="p-4">
-      <DailyRecommend
-        imageUrl=""
-        title="今日のおすすめ"
-        sakeName="獺祭 純米大吟醸 磨き三割九分"
-      />
+      <DailyRecommend imageUrl="" title="今日のおすすめ" sakeName="獺祭 純米大吟醸 磨き三割九分" />
     </div>
 
     <!-- 次回のイベント -->

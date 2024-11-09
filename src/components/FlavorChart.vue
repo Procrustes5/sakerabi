@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { FlavorChart } from '@/types/sake';
-import { FLAVOR_LABELS } from '@/constants/flavorLabels';
-import { computed } from 'vue';
-import { AlertCircle } from 'lucide-vue-next';
+import type { FlavorChart } from '@/types/sake'
+import { FLAVOR_LABELS } from '@/constants/flavorLabels'
+import { computed } from 'vue'
+import { AlertCircle } from 'lucide-vue-next'
 
 interface Props {
-  data: FlavorChart & { brand_id?: number };
+  data: FlavorChart & { brand_id?: number }
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 // brand_id を除外したデータを作成
 const flavorData = computed(() => {
-  const { brand_id, ...flavors } = props.data;
-  return flavors;
-});
+  const { brand_id, ...flavors } = props.data
+  return flavors
+})
 
 // すべての値が empty かどうかをチェック
 const isAllEmpty = computed(() => {
-  return Object.values(flavorData.value).every(value => !value);
-});
+  return Object.values(flavorData.value).every((value) => !value)
+})
 </script>
 
 <template>
@@ -44,10 +44,7 @@ const isAllEmpty = computed(() => {
     </div>
 
     <!-- 評価が存在しない場合 -->
-    <div
-      v-else
-      class="flex items-center justify-center p-4 text-sm text-gray-500 space-x-2"
-    >
+    <div v-else class="flex items-center justify-center p-4 text-sm text-gray-500 space-x-2">
       <AlertCircle class="w-5 h-5" />
       <span>まだ評価がありません</span>
     </div>

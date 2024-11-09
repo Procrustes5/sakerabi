@@ -1,59 +1,53 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Bell, Search } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
-import Logo from '../assets/logo.svg';
+import { Bell, Search } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+import Logo from '../assets/logo.svg'
 
 interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
+  id: string
+  title: string
+  message: string
+  timestamp: Date
+  read: boolean
 }
 
-const router = useRouter();
+const router = useRouter()
 
-const hasNotification = ref(true);  // 通知の有無を制御
-const isScrolled = ref(false);
+const hasNotification = ref(true) // 通知の有無を制御
+const isScrolled = ref(false)
 
 const emit = defineEmits<{
-  'search': []
-  'notification': []
-}>();
+  search: []
+  notification: []
+}>()
 
 // 検索モーダルの状態管理
-const isSearchOpen = ref(false);
-const notifications = ref<Notification[]>([]);
+const isSearchOpen = ref(false)
+const notifications = ref<Notification[]>([])
 
-const unreadCount = computed(() =>
-  notifications.value.filter(n => !n.read).length
-);
+const unreadCount = computed(() => notifications.value.filter((n) => !n.read).length)
 const toggleSearch = () => {
-  isSearchOpen.value = !isSearchOpen.value;
-  emit('search');
-};
+  isSearchOpen.value = !isSearchOpen.value
+  emit('search')
+}
 
 const handleClick = () => {
-  router.push('/');
-};
+  router.push('/')
+}
 
 // スクロール位置に応じてヘッダーの見た目を変更
 if (typeof window !== 'undefined') {
   window.addEventListener('scroll', () => {
-    isScrolled.value = window.scrollY > 10;
-  });
+    isScrolled.value = window.scrollY > 10
+  })
 }
 </script>
 
 <template>
   <header
     class="sticky top-0 z-50 transition-all duration-300"
-    :class="[
-      isScrolled
-        ? 'bg-white/80 backdrop-blur-lg shadow-sm'
-        : 'bg-transparent'
-    ]"
+    :class="[isScrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm' : 'bg-transparent']"
   >
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
@@ -66,18 +60,24 @@ if (typeof window !== 'undefined') {
               class="w-8 h-8 text-white transform hover:scale-110 transition-transform duration-300"
             />
           </div>
-          <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+          <h1
+            class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600"
+          >
             sakerabi
           </h1>
         </div>
 
         <!-- 右側のアクション -->
         <div class="flex items-center space-x-4">
-          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200">
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
+          >
             <Search class="w-5 h-5 text-gray-600" />
           </button>
 
-          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200 relative">
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200 relative"
+          >
             <Bell class="w-5 h-5 text-gray-600" />
             <!-- 通知バッジ -->
             <span

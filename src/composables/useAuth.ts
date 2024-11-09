@@ -15,26 +15,23 @@ export const useAuth = () => {
       const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
-        }
+          redirectTo: `${window.location.origin}/`,
+        },
       })
 
       if (authError) throw authError
 
       // ログイン成功後、プロフィールを作成
       if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            user_id: data.user.id,
-            display_name: data.user.user_metadata.full_name || 'Anonymous',
-            created_at: new Date().toISOString()
-          })
+        const { error: profileError } = await supabase.from('profiles').upsert({
+          id: data.user.id,
+          user_id: data.user.id,
+          display_name: data.user.user_metadata.full_name || 'Anonymous',
+          created_at: new Date().toISOString(),
+        })
 
         if (profileError) throw profileError
       }
-
     } catch (err) {
       error.value = err instanceof Error ? err.message : '認証エラーが発生しました'
     } finally {
@@ -51,6 +48,6 @@ export const useAuth = () => {
     user,
     loading,
     error,
-    handleGoogleLogin
+    handleGoogleLogin,
   }
 }

@@ -4,13 +4,13 @@ export const FLAVOR_LABELS = {
   f3_juukou: '重厚',
   f4_odayaka: '穏やか',
   f5_dry: 'ドライ',
-  f6_keiikai: '軽快'
-} as const;
+  f6_keiikai: '軽快',
+} as const
 
 export const PLACEHOLDER_TAGS = [
   { id: 1, tag: '日本酒' },
-  { id: 2, tag: 'おすすめ' }
-];
+  { id: 2, tag: 'おすすめ' },
+]
 
 export const DEFAULT_FLAVOR_CHART = {
   f1_hanayaka: 0,
@@ -19,4 +19,4 @@ export const DEFAULT_FLAVOR_CHART = {
   f4_odayaka: 0,
   f5_dry: 0,
   f6_keiikai: 0,
-};
+}

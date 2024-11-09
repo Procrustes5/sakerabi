@@ -2,15 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
-import {
-  LogOut,
-  Settings,
-  Bell,
-  Shield,
-  User,
-  HelpCircle,
-  ChevronRight
-} from 'lucide-vue-next'
+import { LogOut, Settings, Bell, Shield, User, HelpCircle, ChevronRight } from 'lucide-vue-next'
 import AppHeader from '@/components/AppHeader.vue'
 
 const router = useRouter()
@@ -20,33 +12,35 @@ const loading = ref(true)
 const menuItems = [
   {
     icon: User,
-    label: "アカウント情報",
-    description: "個人情報の確認と編集",
-    route: '/account'
+    label: 'アカウント情報',
+    description: '個人情報の確認と編集',
+    route: '/account',
   },
   {
     icon: Bell,
-    label: "通知設定",
-    description: "通知の管理",
-    route: '/notifications'
+    label: '通知設定',
+    description: '通知の管理',
+    route: '/notifications',
   },
   {
     icon: Shield,
-    label: "プライバシーとセキュリティ",
-    description: "セキュリティ設定の管理",
-    route: '/security'
+    label: 'プライバシーとセキュリティ',
+    description: 'セキュリティ設定の管理',
+    route: '/security',
   },
   {
     icon: HelpCircle,
-    label: "ヘルプとサポート",
-    description: "FAQ・お問い合わせ",
-    route: '/help'
-  }
+    label: 'ヘルプとサポート',
+    description: 'FAQ・お問い合わせ',
+    route: '/help',
+  },
 ]
 
 onMounted(async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     profile.value = user
   } catch (error) {
     console.error('Error loading profile:', error)
@@ -71,7 +65,7 @@ const formatDate = (dateString: string) => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   }).format(date)
 }
 
@@ -102,7 +96,7 @@ const navigateToMenu = (route: string) => {
           <!-- プロフィール情報 -->
           <div class="flex-1">
             <h1 class="text-xl font-bold text-gray-900">
-              {{ loading ? 'Loading...' : (profile?.user_metadata?.name || 'Anonymous') }}
+              {{ loading ? 'Loading...' : profile?.user_metadata?.name || 'Anonymous' }}
             </h1>
             <p class="text-sm text-gray-500">
               {{ loading ? '' : profile?.email }}
@@ -111,8 +105,10 @@ const navigateToMenu = (route: string) => {
               <div class="flex items-center">
                 <div class="w-2 h-2 bg-green-500 rounded-full mr-2" />
                 <span class="text-xs text-gray-500">
-                  {{ profile?.app_metadata?.provider?.charAt(0).toUpperCase() +
-                profile?.app_metadata?.provider?.slice(1) }}でログイン中
+                  {{
+                    profile?.app_metadata?.provider?.charAt(0).toUpperCase() +
+                    profile?.app_metadata?.provider?.slice(1)
+                  }}でログイン中
                 </span>
               </div>
             </div>
@@ -136,10 +132,7 @@ const navigateToMenu = (route: string) => {
           @click="navigateToMenu(item.route)"
         >
           <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mr-4">
-            <component
-              :is="item.icon"
-              class="w-5 h-5 text-indigo-600"
-            />
+            <component :is="item.icon" class="w-5 h-5 text-indigo-600" />
           </div>
           <div class="flex-1">
             <h3 class="text-sm font-medium text-gray-900">

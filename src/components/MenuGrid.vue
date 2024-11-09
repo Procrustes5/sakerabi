@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Calendar, Star, Book, Settings, Amphora, BookHeartIcon } from 'lucide-vue-next';
-import MenuItem from './MenuItem.vue';
+import { Calendar, Star, Book, Settings, Amphora, BookHeartIcon } from 'lucide-vue-next'
+import MenuItem from './MenuItem.vue'
 
 const menuItems = [
-  { icon: Star, title: "お気に入り" },
-  { icon: BookHeartIcon, title: "おすすめ" },
-  { icon: Amphora, title: "評価" },
-  { icon: Book, title: "日本酒情報" },
-  { icon: Calendar, title: "イベント" },
-  { icon: Settings, title: "設定" },
-];
+  { icon: Star, title: 'お気に入り' },
+  { icon: BookHeartIcon, title: 'おすすめ' },
+  { icon: Amphora, title: '評価' },
+  { icon: Book, title: '日本酒情報' },
+  { icon: Calendar, title: 'イベント' },
+  { icon: Settings, title: '設定' },
+]
 </script>
 
 <template>

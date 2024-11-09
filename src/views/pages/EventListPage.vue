@@ -1,61 +1,59 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
-import { Plus, Calendar, MapPin, Users } from 'lucide-vue-next';
-import LoadingSpinner from '../../components/LoadingSpinner.vue';
-import ErrorDisplay from '../../components/ErrorDisplay.vue';
+import { Plus, Calendar, MapPin, Users } from 'lucide-vue-next'
+import LoadingSpinner from '../../components/LoadingSpinner.vue'
+import ErrorDisplay from '../../components/ErrorDisplay.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 interface Event {
-  id: number;
-  name: string;
-  date: string;
-  location: string;
-  description: string;
-  created_at: string;
+  id: number
+  name: string
+  date: string
+  location: string
+  description: string
+  created_at: string
 }
 
-const router = useRouter();
-const events = ref<Event[]>([]);
-const isLoading = ref(true);
-const loadError = ref<string | null>(null);
+const router = useRouter()
+const events = ref<Event[]>([])
+const isLoading = ref(true)
+const loadError = ref<string | null>(null)
 
 const fetchEvents = async () => {
-  isLoading.value = true;
-  loadError.value = null;
+  isLoading.value = true
+  loadError.value = null
 
   try {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
+    const { data, error } = await supabase.from('events').select('*')
 
-    if (error) throw error;
-    events.value = data;
+    if (error) throw error
+    events.value = data
   } catch (error) {
-    loadError.value = '開催予定のイベント情報の取得に失敗しました。';
-    console.error('Error fetching events:', error);
+    loadError.value = '開催予定のイベント情報の取得に失敗しました。'
+    console.error('Error fetching events:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('ja-JP', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    weekday: 'short'
-  });
-};
+    weekday: 'short',
+  })
+}
 
 const navigateToCreate = () => {
-  router.push('/events/create');
-};
+  router.push('/events/create')
+}
 
 onMounted(() => {
-  fetchEvents();
-});
+  fetchEvents()
+})
 </script>
 
 <template>
@@ -74,11 +72,7 @@ onMounted(() => {
 
     <LoadingSpinner v-if="isLoading" />
 
-    <ErrorDisplay
-      v-else-if="loadError"
-      :message="loadError"
-      :onRetry="fetchEvents"
-    />
+    <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="fetchEvents" />
 
     <div v-else-if="events.length === 0" class="text-center py-12">
       <p class="text-gray-500">開催予定のイベントはありません</p>
