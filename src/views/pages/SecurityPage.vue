@@ -38,7 +38,7 @@ const showDeleteAccountDialog = () => {
 const handleDeleteAccount = async () => {
   try {
     await deleteAccount()
-    router.push('/welcome')
+    await router.push('/welcome')
   } catch (err) {
     toast.error('アカウントの削除に失敗しました')
     showDeleteConfirm.value = false
@@ -68,14 +68,9 @@ const goBack = () => {
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
 
-      <!-- エラーメッセージ -->
-      <div v-else-if="error" class="bg-red-50 text-red-600 p-4 rounded-xl mb-6">
-        {{ error }}
-      </div>
-
       <div v-else>
         <!-- プライバシー設定セクション -->
-        <div class="bg-white rounded-2xl shadow-sm mb-6">
+        <div v-if="!error" class="bg-white rounded-2xl shadow-sm mb-6">
           <div class="p-6">
             <div class="flex items-center mb-4">
               <Shield class="w-5 h-5 text-indigo-600 mr-2" />
@@ -96,7 +91,7 @@ const goBack = () => {
                   <input
                     type="checkbox"
                     :checked="settings.showProfile"
-                    @change="e => handleSettingChange(e.target.checked)"
+                    @change="e => handleSettingChange(e.target?.checked)"
                     class="sr-only peer"
                   >
                   <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer
@@ -112,7 +107,7 @@ const goBack = () => {
         </div>
 
         <!-- データ管理セクション -->
-        <div class="bg-white rounded-2xl shadow-sm mb-6">
+        <div v-if="!error" class="bg-white rounded-2xl shadow-sm mb-6">
           <div class="p-6">
             <h2 class="text-lg font-bold text-gray-900 mb-4">データ管理</h2>
             <div>
