@@ -15,9 +15,9 @@ const { settings, loading, error, loadSettings, updateSettings, deleteAccount } 
 const toast = useToast()
 
 // 初期設定の読み込み
-// onMounted(async () => {
-//   await loadSettings()
-// })
+onMounted(async () => {
+  await loadSettings()
+})
 
 // 設定変更時の処理
 const handleSettingChange = async (checked: boolean) => {

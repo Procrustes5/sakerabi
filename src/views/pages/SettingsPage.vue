@@ -4,10 +4,13 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import { LogOut, Settings, Bell, Shield, User, HelpCircle, ChevronRight } from 'lucide-vue-next'
 import AppHeader from '@/components/AppHeader.vue'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const profile = ref<any>(null)
 const loading = ref(true)
+
+const toast = useToast()
 
 const menuItems = [
   {
@@ -52,6 +55,7 @@ onMounted(async () => {
 const handleLogout = async () => {
   try {
     await supabase.auth.signOut()
+    toast.success('ログアウトしました。')
     router.push('/welcome')
   } catch (error) {
     console.error('Error signing out:', error)

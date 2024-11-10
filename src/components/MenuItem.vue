@@ -14,6 +14,9 @@ const handleClick = () => {
     router.push('/events')
   } else if (props.title === '設定') {
     router.push('/settings')
+  } else if (props.title === '日本酒wiki') {
+    // 新しいタブで開き、より安全なrel属性を設定
+    window.open('https://www.nihonshu.wiki/', '_blank', 'noopener,noreferrer')
   }
 }
 </script>
