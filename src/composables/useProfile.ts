@@ -18,7 +18,9 @@ export const useProfile = () => {
 
   // 現在のユーザーを取得
   const getCurrentUser = async (): Promise<User | null> => {
-    const { data: { session } } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
     return session?.user ?? null
   }
 
@@ -40,7 +42,8 @@ export const useProfile = () => {
         .single()
 
       if (profileError) {
-        if (profileError.code === 'PGRST116') { // データが見つからない場合
+        if (profileError.code === 'PGRST116') {
+          // データが見つからない場合
           // 初期プロフィールを作成
           return await createInitialProfile(user)
         }
@@ -54,9 +57,8 @@ export const useProfile = () => {
         displayName: data.display_name,
         bio: data.bio || '',
         avatarUrl: data.avatar_url,
-        updatedAt: data.updated_at
+        updatedAt: data.updated_at,
       }
-
     } catch (err) {
       console.error('Profile loading error:', err)
       error.value = 'プロフィールの読み込みに失敗しました'
@@ -74,7 +76,7 @@ export const useProfile = () => {
       display_name: user.user_metadata?.full_name || 'Anonymous',
       avatar_url: user.user_metadata?.avatar_url || null,
       bio: '',
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
     const { data, error: createError } = await supabase
@@ -91,7 +93,7 @@ export const useProfile = () => {
       displayName: data.display_name,
       bio: data.bio,
       avatarUrl: data.avatar_url,
-      updatedAt: data.updated_at
+      updatedAt: data.updated_at,
     }
 
     return profile.value
@@ -111,7 +113,7 @@ export const useProfile = () => {
         display_name: updatedProfile.displayName,
         bio: updatedProfile.bio,
         avatar_url: updatedProfile.avatarUrl,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       }
 
       const { data, error: updateError } = await supabase
@@ -130,9 +132,8 @@ export const useProfile = () => {
         displayName: data.display_name,
         bio: data.bio,
         avatarUrl: data.avatar_url,
-        updatedAt: data.updated_at
+        updatedAt: data.updated_at,
       }
-
     } catch (err) {
       console.error('Profile update error:', err)
       error.value = 'プロフィールの更新に失敗しました'
@@ -155,9 +156,7 @@ export const useProfile = () => {
       if (profile.value?.avatarUrl) {
         const fileName = profile.value.avatarUrl.split('/').pop()
         if (fileName) {
-          await supabase.storage
-            .from('avatars')
-            .remove([fileName])
+          await supabase.storage.from('avatars').remove([fileName])
         }
       }
 
@@ -174,7 +173,6 @@ export const useProfile = () => {
       if (deleteUserError) throw deleteUserError
 
       profile.value = null
-
     } catch (err) {
       console.error('Account deletion error:', err)
       error.value = 'アカウントの削除に失敗しました'

@@ -5,7 +5,7 @@ import MenuItem from './MenuItem.vue'
 const menuItems = [
   { icon: Star, title: 'お気に入り' },
   { icon: BookHeartIcon, title: 'おすすめ' },
-  { icon: Amphora, title: '評価' },
+  { icon: Amphora, title: '日本酒' },
   { icon: Book, title: '日本酒wiki' },
   { icon: Calendar, title: 'イベント' },
   { icon: Settings, title: '設定' },

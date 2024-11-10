@@ -117,7 +117,6 @@ onUnmounted(() => {
                 class="absolute top-4 left-4"
                 :data="brand.flavor_chart"
               />
-              <FlavorTags class="absolute top-4 right-4" />
             </div>
 
             <!-- タイトルと説明 -->

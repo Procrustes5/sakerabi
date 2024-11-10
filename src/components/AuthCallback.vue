@@ -13,17 +13,18 @@ const createOrUpdateProfile = async (currentUser: User): Promise<boolean> => {
   console.log('Creating/Updating profile for user:', currentUser.id)
 
   try {
-    const { data, error: profileError } = await supabase
-      .from('profiles')
-      .upsert({
+    const { data, error: profileError } = await supabase.from('profiles').upsert(
+      {
         id: currentUser.id,
         email: currentUser.email,
         display_name: currentUser.user_metadata?.full_name || 'Anonymous',
         avatar_url: currentUser.user_metadata?.avatar_url || null,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'id'
-      })
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'id',
+      },
+    )
 
     if (profileError) {
       console.error('Profile creation/update failed:', profileError)
@@ -41,7 +42,10 @@ const createOrUpdateProfile = async (currentUser: User): Promise<boolean> => {
 onMounted(async () => {
   try {
     // 現在のセッションを取得
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
 
     if (sessionError) throw sessionError
 
@@ -74,8 +78,6 @@ onMounted(async () => {
     <div v-if="error" class="text-red-500">
       {{ error }}
     </div>
-    <div v-else class="text-gray-600">
-      認証処理中...
-    </div>
+    <div v-else class="text-gray-600">認証処理中...</div>
   </div>
 </template>

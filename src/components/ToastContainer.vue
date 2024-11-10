@@ -56,10 +56,7 @@ const handleSwipe = (id: number) => {
         @click="remove(toast.id)"
         @touchstart="handleSwipe(toast.id)"
       >
-        <component
-          :is="getIcon(toast.type)"
-          class="w-5 h-5 flex-shrink-0"
-        />
+        <component :is="getIcon(toast.type)" class="w-5 h-5 flex-shrink-0" />
         <p class="text-sm font-medium flex-1">{{ toast.message }}</p>
       </div>
     </TransitionGroup>

@@ -14,12 +14,11 @@ export const useAuth = () => {
       const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
 
       if (authError) throw authError
-
     } catch (err) {
       error.value = err instanceof Error ? err.message : '認証エラーが発生しました'
       console.error('Login error:', err)
@@ -32,7 +31,9 @@ export const useAuth = () => {
   const initializeAuth = async () => {
     try {
       loading.value = true
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
       if (session?.user) {
         user.value = session.user
@@ -59,6 +60,6 @@ export const useAuth = () => {
     user,
     loading,
     error,
-    handleGoogleLogin
+    handleGoogleLogin,
   }
 }

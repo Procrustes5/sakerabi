@@ -30,9 +30,7 @@ const fetchEvents = async () => {
 
   try {
     // イベント情報と、各イベントに紐づく日本酒の数を取得
-    const { data, error } = await supabase
-      .from('events')
-      .select(`
+    const { data, error } = await supabase.from('events').select(`
         *,
         event_brands:event_brands (
           count
@@ -42,11 +40,11 @@ const fetchEvents = async () => {
     if (error) throw error
 
     // event_brandsの数を_countプロパティに変換
-    events.value = data.map(event => ({
+    events.value = data.map((event) => ({
       ...event,
       _count: {
-        brands: event.event_brands[0]?.count || 0
-      }
+        brands: event.event_brands[0]?.count || 0,
+      },
     }))
   } catch (error) {
     loadError.value = '開催予定のイベント情報の取得に失敗しました。'
@@ -103,11 +101,7 @@ onMounted(() => {
     <LoadingSpinner v-if="isLoading" />
 
     <!-- エラー表示 -->
-    <ErrorDisplay
-      v-else-if="loadError"
-      :message="loadError"
-      :onRetry="fetchEvents"
-    />
+    <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="fetchEvents" />
 
     <!-- イベントが存在しない場合 -->
     <div v-else-if="events.length === 0" class="text-center py-12">

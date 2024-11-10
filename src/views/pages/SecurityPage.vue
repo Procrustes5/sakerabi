@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import {
-  Shield,
-  UserCircle,
-  ArrowLeft
-} from 'lucide-vue-next'
+import { Shield, UserCircle, ArrowLeft } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { usePrivacySettings } from '@/composables/usePrivacySettings'
 import { useToast } from '@/composables/useToast' // トースト通知用のコンポーザブル
 
 const router = useRouter()
 const showDeleteConfirm = ref(false)
-const { settings, loading, error, loadSettings, updateSettings, deleteAccount } = usePrivacySettings()
+const { settings, loading, error, loadSettings, updateSettings, deleteAccount } =
+  usePrivacySettings()
 const toast = useToast()
 
 // 初期設定の読み込み
@@ -91,15 +88,12 @@ const goBack = () => {
                   <input
                     type="checkbox"
                     :checked="settings.showProfile"
-                    @change="e => handleSettingChange(e.target?.checked)"
+                    @change="(e) => handleSettingChange(e.target?.checked)"
                     class="sr-only peer"
-                  >
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer
-                            peer-checked:after:translate-x-full peer-checked:after:border-white
-                            after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                            after:bg-white after:border-gray-300 after:border after:rounded-full
-                            after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600">
-                  </div>
+                  />
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+                  ></div>
                 </label>
               </div>
             </div>
@@ -113,8 +107,7 @@ const goBack = () => {
             <div>
               <button
                 @click="showDeleteAccountDialog"
-                class="w-full py-3 px-4 border border-red-200 rounded-xl text-sm
-                       font-medium text-red-600 hover:bg-red-50 transition-colors duration-200"
+                class="w-full py-3 px-4 border border-red-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-200"
               >
                 アカウントを削除
               </button>
@@ -138,8 +131,10 @@ const goBack = () => {
     </main>
 
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteConfirm"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      v-if="showDeleteConfirm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
       <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold text-gray-900 mb-2">アカウントを削除しますか？</h3>
         <p class="text-sm text-gray-500 mb-6">
@@ -148,15 +143,13 @@ const goBack = () => {
         <div class="flex space-x-3">
           <button
             @click="showDeleteConfirm = false"
-            class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-sm
-                   font-medium text-gray-700 hover:bg-gray-50"
+            class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             キャンセル
           </button>
           <button
             @click="handleDeleteAccount"
-            class="flex-1 py-2 px-4 bg-red-600 text-white rounded-xl text-sm
-                   font-medium hover:bg-red-700"
+            class="flex-1 py-2 px-4 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700"
             :disabled="loading"
           >
             {{ loading ? '処理中...' : '削除する' }}

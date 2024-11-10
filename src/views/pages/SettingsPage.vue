@@ -2,7 +2,16 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
-import { LogOut, Settings, Bell, Shield, User, HelpCircle, ChevronRight, UserCircle } from 'lucide-vue-next'
+import {
+  LogOut,
+  Settings,
+  Bell,
+  Shield,
+  User,
+  HelpCircle,
+  ChevronRight,
+  UserCircle,
+} from 'lucide-vue-next'
 import AppHeader from '@/components/AppHeader.vue'
 import { useToast } from '@/composables/useToast'
 import { useProfile } from '@/composables/useProfile'
@@ -88,20 +97,25 @@ const getInitial = (name: string) => {
       <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div class="flex items-center space-x-4">
           <!-- プロフィールアバター -->
-          <div v-if="loading || profileLoading"
-               class="w-20 h-20 bg-gray-200 rounded-full animate-pulse" />
+          <div
+            v-if="loading || profileLoading"
+            class="w-20 h-20 bg-gray-200 rounded-full animate-pulse"
+          />
           <div v-else class="relative w-20 h-20">
-            <div v-if="profile?.avatarUrl"
-                 class="w-full h-full rounded-full overflow-hidden bg-gray-100">
+            <div
+              v-if="profile?.avatarUrl"
+              class="w-full h-full rounded-full overflow-hidden bg-gray-100"
+            >
               <img
                 :src="profile.avatarUrl"
                 :alt="profile.displayName"
                 class="w-full h-full object-cover"
-              >
+              />
             </div>
-            <div v-else
-                 class="w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full
-                        flex items-center justify-center">
+            <div
+              v-else
+              class="w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center"
+            >
               <span class="text-3xl font-bold text-white">
                 {{ getInitial(profile.displayName) }}
               </span>
@@ -120,8 +134,11 @@ const getInitial = (name: string) => {
               <div class="flex items-center">
                 <div class="w-2 h-2 bg-green-500 rounded-full mr-2" />
                 <span class="text-xs text-gray-500">
-                  {{ profile?.provider ? (profile.provider.charAt(0).toUpperCase() +
-                  profile.provider.slice(1)) : 'Google' }}でログイン中
+                  {{
+                    profile?.provider
+                      ? profile.provider.charAt(0).toUpperCase() + profile.provider.slice(1)
+                      : 'Google'
+                  }}でログイン中
                 </span>
               </div>
             </div>
@@ -131,7 +148,8 @@ const getInitial = (name: string) => {
         <!-- 最終ログイン情報 -->
         <div class="mt-6 pt-6 border-t border-gray-100">
           <div class="text-sm text-gray-500">
-            最終ログイン: {{ loading ? '' : formatDate(profile?.updatedAt || new Date().toISOString()) }}
+            最終ログイン:
+            {{ loading ? '' : formatDate(profile?.updatedAt || new Date().toISOString()) }}
           </div>
         </div>
       </div>

@@ -12,21 +12,24 @@ const openItem = ref<number | null>(null)
 
 const faqs: FAQ[] = [
   {
-    question: "ログインについて",
-    answer: "現在、本アプリではGoogleアカウントを使用したログインのみに対応しています。管理者がシステムにメールアドレスを登録する必要があるため、当システムを利用する方は管理者にご連絡ください。"
+    question: 'ログインについて',
+    answer:
+      '現在、本アプリではGoogleアカウントを使用したログインのみに対応しています。管理者がシステムにメールアドレスを登録する必要があるため、当システムを利用する方は管理者にご連絡ください。',
   },
   {
-    question: "イベントの作成について",
-    answer: "どなたでも自由にイベントを作成することができます。イベントページから「新規イベント作成」ボタンを押して、必要事項を入力するだけです。"
+    question: 'イベントの作成について',
+    answer:
+      'どなたでも自由にイベントを作成することができます。イベントページから「新規イベント作成」ボタンを押して、必要事項を入力するだけです。',
   },
   {
-    question: "日本酒の追加について",
-    answer: "すべてのユーザーが新しい日本酒を追加することができます。なお、デフォルトで登録されている日本酒の情報は「さけのわデータ」をソースとして使用しています。"
+    question: '日本酒の追加について',
+    answer:
+      'すべてのユーザーが新しい日本酒を追加することができます。なお、デフォルトで登録されている日本酒の情報は「さけのわデータ」をソースとして使用しています。',
   },
   {
-    question: "お問い合わせ方法",
-    answer: "ご不明点やご質問がございましたら、管理者までご連絡ください。"
-  }
+    question: 'お問い合わせ方法',
+    answer: 'ご不明点やご質問がございましたら、管理者までご連絡ください。',
+  },
 ]
 
 const handleItemClick = (index: number) => {
@@ -67,10 +70,7 @@ const handleItemClick = (index: number) => {
             <ChevronUp v-if="openItem === index" class="w-5 h-5 text-gray-400" />
             <ChevronDown v-else class="w-5 h-5 text-gray-400" />
           </button>
-          <div
-            v-if="openItem === index"
-            class="px-4 pb-4 text-sm text-gray-600"
-          >
+          <div v-if="openItem === index" class="px-4 pb-4 text-sm text-gray-600">
             {{ faq.answer }}
           </div>
         </div>

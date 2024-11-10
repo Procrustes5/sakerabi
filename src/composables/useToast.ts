@@ -24,7 +24,7 @@ export const useToast = () => {
   }
 
   const removeToast = (id: number) => {
-    const index = toasts.value.findIndex(t => t.id === id)
+    const index = toasts.value.findIndex((t) => t.id === id)
     if (index > -1) {
       toasts.value.splice(index, 1)
     }
@@ -34,7 +34,7 @@ export const useToast = () => {
     return addToast({
       message,
       type: 'success',
-      icon: '✓'
+      icon: '✓',
     })
   }
 
@@ -42,7 +42,7 @@ export const useToast = () => {
     return addToast({
       message,
       type: 'error',
-      icon: '✕'
+      icon: '✕',
     })
   }
 
@@ -50,7 +50,7 @@ export const useToast = () => {
     return addToast({
       message,
       type: 'info',
-      icon: 'i'
+      icon: 'i',
     })
   }
 
@@ -59,6 +59,6 @@ export const useToast = () => {
     success,
     error,
     info,
-    remove: removeToast
+    remove: removeToast,
   }
 }

@@ -1,117 +1,184 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Heart, MessageCircle, Share2, MapPin, Calendar } from 'lucide-vue-next'
-import UserAvatar from './UserAvatar.vue'
+import { Heart, MessageCircle, Share2, Star } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 
-interface SakeReview {
+interface Event {
+  name: string
+  date: string
+  location: string
+}
+
+interface ReviewProps {
   id: string
-  userImage?: string
+  userImage: string
   userName: string
   timestamp: string
   sakeName: string
   rating: number
   content: string
-  image?: string
+  image: string | null
   likes: number
   comments: number
-  event?: {
-    name: string
-    date: string
-    location: string
-  }
+  isLiked?: boolean
+  event: Event
 }
 
 const props = defineProps<{
-  review: SakeReview
+  review: ReviewProps
 }>()
 
-const isLiked = ref(false)
-const likesCount = ref(props.review.likes)
+const emit = defineEmits<{
+  (e: 'toggle-like', id: string): void
+  (e: 'show-comments'): void
+}>()
 
-const handleLike = () => {
-  if (isLiked.value) {
-    likesCount.value--
-  } else {
-    likesCount.value++
-  }
-  isLiked.value = !isLiked.value
+const router = useRouter()
+const imageError = ref(false)
+const showFullContent = ref(false)
+const isContentLong = ref(false)
+
+// コンテンツの長さをチェック（150文字以上で省略）
+const checkContentLength = () => {
+  isContentLong.value = props.review.content.length > 150
 }
+
+// 画像読み込みエラー時のハンドラー
+const handleImageError = () => {
+  imageError.value = true
+}
+
+// ユーザープロフィールページへの遷移
+const navigateToProfile = () => {
+  router.push(`/users/${props.review.id}`)
+}
+
+// シェア機能
+const shareReview = async () => {
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: `${props.review.userName}さんの${props.review.sakeName}の感想`,
+        text: props.review.content,
+        url: window.location.href,
+      })
+    } else {
+      // フォールバック: URLをクリップボードにコピー
+      await navigator.clipboard.writeText(window.location.href)
+      // TODO: コピー成功を通知
+    }
+  } catch (error) {
+    console.error('Error sharing:', error)
+  }
+}
+
+checkContentLength()
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-    <!-- ユーザー情報 -->
-    <div class="p-4 flex items-center space-x-3">
-      <UserAvatar :image="review.userImage" :name="review.userName" size="md" />
-      <div class="flex-1">
-        <h3 class="font-semibold text-gray-900">{{ review.userName }}</h3>
-        <p class="text-xs text-gray-500">{{ review.timestamp }}</p>
-      </div>
-    </div>
-
-    <!-- 日本酒情報 -->
-    <div class="px-4 py-2">
-      <h4 class="text-lg font-medium text-gray-900">{{ review.sakeName }}</h4>
-      <div class="flex items-center mt-1">
-        <div class="flex">
-          <template v-for="i in 5" :key="i">
-            <svg
-              :class="['w-4 h-4', i <= review.rating ? 'text-yellow-400' : 'text-gray-300']"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+  <div
+    class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
+  >
+    <!-- ヘッダー部分 -->
+    <div class="p-4">
+      <div class="flex items-start justify-between">
+        <!-- ユーザー情報 -->
+        <div class="flex items-center space-x-3">
+          <button @click="navigateToProfile" class="block">
+            <img
+              :src="review.userImage"
+              :alt="review.userName"
+              class="w-10 h-10 rounded-full object-cover"
+              @error="handleImageError"
+              v-if="!imageError"
+            />
+            <div v-else class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+              <span class="text-gray-500 text-sm">
+                {{ review.userName.charAt(0) }}
+              </span>
+            </div>
+          </button>
+          <div>
+            <button
+              @click="navigateToProfile"
+              class="font-medium text-gray-900 hover:text-gray-600"
             >
-              <path
-                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-              />
-            </svg>
-          </template>
+              {{ review.userName }}
+            </button>
+            <p class="text-sm text-gray-500">{{ review.timestamp }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- レビュー内容 -->
-    <p class="px-4 py-2 text-gray-700">{{ review.content }}</p>
+      <!-- 日本酒名 -->
+      <h3 class="mt-2 text-lg font-semibold text-gray-900">
+        {{ review.sakeName }}
+      </h3>
 
-    <!-- 画像（存在する場合） -->
-    <img
-      v-if="review.image"
-      :src="review.image"
-      :alt="review.sakeName"
-      class="w-full aspect-video object-cover"
-    />
+      <!-- イベント情報 -->
+      <div class="mt-1 text-sm text-gray-500">
+        <p>{{ review.event.name }}</p>
+        <p>{{ review.event.date }} @ {{ review.event.location }}</p>
+      </div>
 
-    <!-- イベント情報（存在する場合） -->
-    <div v-if="review.event" class="px-4 py-2 bg-gray-50">
-      <div class="flex items-center space-x-4">
-        <div class="flex items-center text-gray-600">
-          <Calendar class="w-4 h-4 mr-1" />
-          <span class="text-sm">{{ review.event.date }}</span>
-        </div>
-        <div class="flex items-center text-gray-600">
-          <MapPin class="w-4 h-4 mr-1" />
-          <span class="text-sm">{{ review.event.location }}</span>
+      <!-- レビュー内容 -->
+      <div class="mt-3">
+        <p :class="['text-gray-700', { 'line-clamp-3': isContentLong && !showFullContent }]">
+          {{ review.content }}
+        </p>
+        <button
+          v-if="isContentLong"
+          @click="showFullContent = !showFullContent"
+          class="mt-1 text-sm text-indigo-600 hover:text-indigo-700"
+        >
+          {{ showFullContent ? '閉じる' : '続きを読む' }}
+        </button>
+      </div>
+
+      <!-- 画像 -->
+      <div v-if="review.image" class="mt-3">
+        <img
+          :src="review.image"
+          :alt="review.sakeName"
+          class="rounded-lg w-full h-auto object-cover max-h-96"
+          @error="handleImageError"
+        />
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="mt-4 flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          <!-- いいねボタン -->
+          <button
+            @click="$emit('toggle-like', review.id)"
+            class="flex items-center space-x-2 group"
+            :class="{ 'text-red-500': review.isLiked }"
+          >
+            <Heart
+              :class="[
+                'w-5 h-5 transition-colors',
+                review.isLiked ? 'fill-current' : 'group-hover:text-red-500',
+              ]"
+            />
+            <span class="text-sm text-gray-500 group-hover:text-gray-700">
+              {{ review.likes }}
+            </span>
+          </button>
+
+          <!-- コメントボタン -->
+          <button @click="$emit('show-comments')" class="flex items-center space-x-2 group">
+            <MessageCircle class="w-5 h-5 group-hover:text-indigo-500" />
+            <span class="text-sm text-gray-500 group-hover:text-gray-700">
+              {{ review.comments }}
+            </span>
+          </button>
+
+          <!-- シェアボタン -->
+          <button @click="shareReview" class="group">
+            <Share2 class="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+          </button>
         </div>
       </div>
-      <p class="text-sm text-gray-700 mt-1">{{ review.event.name }}</p>
-    </div>
-
-    <!-- アクション -->
-    <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
-      <button
-        @click="handleLike"
-        class="flex items-center space-x-2"
-        :class="{ 'text-red-500': isLiked, 'text-gray-600': !isLiked }"
-      >
-        <Heart class="w-5 h-5" :fill="isLiked ? 'currentColor' : 'none'" />
-        <span class="text-sm">{{ likesCount }}</span>
-      </button>
-      <button class="flex items-center space-x-2 text-gray-600">
-        <MessageCircle class="w-5 h-5" />
-        <span class="text-sm">{{ review.comments }}</span>
-      </button>
-      <button class="flex items-center space-x-2 text-gray-600">
-        <Share2 class="w-5 h-5" />
-      </button>
     </div>
   </div>
 </template>

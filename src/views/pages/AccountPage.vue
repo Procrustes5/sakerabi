@@ -9,7 +9,7 @@ import {
   Settings,
   Shield,
   Bell,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-vue-next'
 import { useProfile } from '@/composables/useProfile'
 import { supabase } from '@/utils/supabase'
@@ -26,7 +26,7 @@ const {
   error,
   loadProfile,
   updateProfile: saveProfile,
-  deleteAccount
+  deleteAccount,
 } = useProfile()
 
 const editedProfile = ref({
@@ -62,9 +62,7 @@ const onFileSelected = async (event: Event) => {
     const filePath = `avatars/${fileName}`
 
     // Storage にアップロード
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file)
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
     if (uploadError) throw uploadError
 
@@ -87,7 +85,7 @@ const updateProfile = async () => {
     loading.value = true
     await saveProfile({
       ...profile.value,
-      ...editedProfile.value
+      ...editedProfile.value,
     })
     toast.success('プロフィールを更新しました')
   } catch (err) {
@@ -160,7 +158,7 @@ const goBack = () => {
                     :src="profile?.avatarUrl"
                     :alt="profile?.displayName"
                     class="w-full h-full object-cover"
-                  >
+                  />
                   <UserCircle v-else class="w-full h-full text-gray-400 p-2" />
                 </div>
                 <button
@@ -175,7 +173,7 @@ const goBack = () => {
                   accept="image/*"
                   class="hidden"
                   @change="onFileSelected"
-                >
+                />
               </div>
               <h2 class="text-xl font-bold text-gray-900">{{ profile?.displayName }}</h2>
               <p class="text-sm text-gray-500">{{ profile?.email }}</p>
@@ -190,7 +188,7 @@ const goBack = () => {
                   type="text"
                   class="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-500"
                   placeholder="表示名を入力"
-                >
+                />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">自己紹介</label>
@@ -252,8 +250,10 @@ const goBack = () => {
     </main>
 
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteConfirm"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      v-if="showDeleteConfirm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
       <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold text-gray-900 mb-2">アカウントを削除しますか？</h3>
         <p class="text-sm text-gray-500 mb-6">
