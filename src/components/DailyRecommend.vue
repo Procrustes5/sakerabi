@@ -110,12 +110,6 @@ onUnmounted(() => {
 
           <!-- メインコンテンツ -->
           <div class="relative w-full h-full">
-            <!-- 日本酒アイコン -->
-            <div
-              class="absolute bottom-1/3 left-32 flex items-center justify-center pointer-events-none"
-            >
-              <div class="sake-icon text-8xl text-white">🍶</div>
-            </div>
             <!-- フレーバーチャートとタグ -->
             <div class="relative z-10">
               <FlavorChart

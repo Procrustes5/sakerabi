@@ -38,6 +38,11 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/events/:id',
+      name: 'event-detail',
+      component: () => import('@/views/pages/EventDetailPage.vue')
+    },
+    {
       path: '/events/create',
       name: 'event-create',
       component: EventCreateView,
