@@ -9,6 +9,7 @@ import SecurityPage from '@/views/pages/SecurityPage.vue'
 import AuthCallback from '@/components/AuthCallback.vue'
 import AccountPage from '@/views/pages/AccountPage.vue'
 import HelpPage from '@/views/pages/HelpPage.vue'
+import SakeDetail from '@/components/SakeDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,6 +55,11 @@ const router = createRouter({
       component: () => import('../views/pages/EventEditPage.vue'),
       props: true,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/sake/:id',
+      name: 'sake-detail',
+      component: SakeDetail,
     },
     {
       path: '/settings',

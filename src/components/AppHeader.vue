@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { Bell, Search } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import Logo from '../assets/logo.svg'
+import SakeSearchModal from '@/components/SakeSearchModal.vue'
 
 interface Notification {
   id: string
@@ -23,14 +24,10 @@ const emit = defineEmits<{
 }>()
 
 // 検索モーダルの状態管理
-const isSearchOpen = ref(false)
+const isSearchModalOpen = ref(false)
 const notifications = ref<Notification[]>([])
 
 const unreadCount = computed(() => notifications.value.filter((n) => !n.read).length)
-const toggleSearch = () => {
-  isSearchOpen.value = !isSearchOpen.value
-  emit('search')
-}
 
 const handleClick = () => {
   router.push('/')
@@ -70,6 +67,7 @@ if (typeof window !== 'undefined') {
         <!-- 右側のアクション -->
         <div class="flex items-center space-x-4">
           <button
+            @click="isSearchModalOpen = true"
             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
           >
             <Search class="w-5 h-5 text-gray-600" />
@@ -88,6 +86,15 @@ if (typeof window !== 'undefined') {
         </div>
       </div>
     </div>
+    <!-- モーダルの追加 -->
+    <SakeSearchModal
+      :is-open="isSearchModalOpen"
+      :on-close="
+        () => {
+          isSearchModalOpen = false
+        }
+      "
+    />
   </header>
 </template>
 

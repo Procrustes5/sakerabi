@@ -98,7 +98,7 @@ onMounted(() => {
     </div>
 
     <!-- ローディング状態 -->
-    <LoadingSpinner v-if="isLoading" />
+    <LoadingSpinner v-if="isLoading" class="h-full flex items-center" />
 
     <!-- エラー表示 -->
     <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="fetchEvents" />
