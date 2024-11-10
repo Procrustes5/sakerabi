@@ -90,8 +90,8 @@ const navigateToDetail = (sake: SearchResult) => {
               v-model="searchQuery"
               type="text"
               placeholder="日本酒を検索..."
-              class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-500 text-base" <!-- text-baseを追加 -->
-            @keyup.enter="handleSearch"
+              class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-500 text-base"
+              @keyup.enter="handleSearch"
             />
             <Search
               class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
@@ -102,7 +102,37 @@ const navigateToDetail = (sake: SearchResult) => {
           </button>
         </div>
       </div>
-      <!-- 残りの部分は変更なし -->
+
+      <!-- 検索結果 -->
+      <div class="flex-1 overflow-y-auto p-4">
+        <div v-if="isSearching" class="text-center py-4 text-gray-600">検索中...</div>
+
+        <div v-else-if="errorMessage" class="text-center py-4 text-red-600">
+          {{ errorMessage }}
+        </div>
+
+        <div
+          v-else-if="searchResults.length === 0 && searchQuery"
+          class="text-center py-4 text-gray-600"
+        >
+          検索結果が見つかりませんでした
+        </div>
+
+        <div v-else class="space-y-4">
+          <button
+            v-for="sake in searchResults"
+            :key="sake.id"
+            class="w-full flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
+            @click="navigateToDetail(sake)"
+          >
+            <div class="flex-1 text-left">
+              <h4 class="font-medium text-gray-900">{{ sake.name }}</h4>
+              <p class="text-sm text-gray-600">{{ sake.brewery?.name }}</p>
+              <p class="text-sm text-gray-500">{{ sake.brewery?.area?.name }}</p>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
