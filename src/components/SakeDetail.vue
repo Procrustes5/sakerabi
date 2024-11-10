@@ -1,31 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
-import { ArrowLeft, Star, Building2, MapPin, Droplets, Info } from 'lucide-vue-next'
+import { ArrowLeft, Star, Building2, MapPin, Droplets } from 'lucide-vue-next'
 import FlavorRating from './FlavorRating.vue'
 
-interface FlavorRating {
-  f1_hanayaka: number
-  f2_houjun: number
-  f3_juukou: number
-  f4_odayaka: number
-  f5_dry: number
-  f6_keiikai: number
-}
-
+// 最小限のインターフェース定義
 interface SakeDetail {
   id: number
   name: string
-  brewery: {
-    id: number
-    name: string
-    area: {
-      id: number
-      name: string
+  brewery?: {
+    id?: number
+    name?: string
+    area?: {
+      id?: number
+      name?: string
     }
   }
-  flavor_chart: FlavorRating
+  flavor_chart?: {
+    f1_hanayaka?: number
+    f2_houjun?: number
+    f3_juukou?: number
+    f4_odayaka?: number
+    f5_dry?: number
+    f6_keiikai?: number
+  }
 }
 
 const route = useRoute()
@@ -64,10 +63,16 @@ const fetchSakeDetail = async () => {
       .single()
 
     if (error) throw error
+
+    // 最低限name属性があることを確認
+    if (!data?.name) {
+      throw new Error('日本酒の名前が取得できませんでした')
+    }
+
     sake.value = data
   } catch (error) {
     console.error('Error fetching sake details:', error)
-    errorMessage.value = '日本酒の詳細情報の取得に失敗しました'
+    errorMessage.value = '日本酒の情報の取得に失敗しました'
   } finally {
     isLoading.value = false
   }
@@ -76,6 +81,11 @@ const fetchSakeDetail = async () => {
 onMounted(() => {
   fetchSakeDetail()
 })
+
+// フレーバーチャートの値を安全に取得するヘルパー関数
+const getFlavorValue = (key: string): number => {
+  return sake.value?.flavor_chart?.[key as keyof Required<NonNullable<SakeDetail['flavor_chart']>>] ?? 0
+}
 </script>
 
 <template>
@@ -119,21 +129,22 @@ onMounted(() => {
         <div class="space-y-6 mb-8">
           <div class="bg-white rounded-2xl p-6 shadow-sm">
             <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ sake.name }}</h1>
-            <div class="space-y-3">
-              <div class="flex items-center gap-2 text-gray-600">
+            <!-- 蔵元情報が存在する場合のみ表示 -->
+            <div v-if="sake.brewery" class="space-y-3">
+              <div v-if="sake.brewery.name" class="flex items-center gap-2 text-gray-600">
                 <Building2 class="w-5 h-5" />
-                <span>{{ sake.brewery?.name }}</span>
+                <span>{{ sake.brewery.name }}</span>
               </div>
-              <div class="flex items-center gap-2 text-gray-600">
+              <div v-if="sake.brewery.area?.name" class="flex items-center gap-2 text-gray-600">
                 <MapPin class="w-5 h-5" />
-                <span>{{ sake.brewery?.area?.name }}</span>
+                <span>{{ sake.brewery.area.name }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 味わいチャート -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <!-- フレーバーチャートが存在する場合のみ表示 -->
+        <div v-if="sake.flavor_chart" class="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div class="flex items-center gap-2 mb-6">
             <Droplets class="w-5 h-5 text-indigo-500" />
             <h3 class="text-lg font-medium text-gray-900">味わいチャート</h3>
@@ -141,7 +152,7 @@ onMounted(() => {
 
           <!-- 六角形のチャート -->
           <div class="flex justify-center mb-12">
-            <FlavorRating v-if="sake.flavor_chart" :values="sake.flavor_chart" :size="280" />
+            <FlavorRating :values="sake.flavor_chart" :size="280" />
           </div>
 
           <!-- バーチャート -->
@@ -163,12 +174,12 @@ onMounted(() => {
                 <div
                   class="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all duration-300"
                   :style="{
-                    width: `${sake.flavor_chart[flavor.key as keyof FlavorRating] * 10}%`,
+                    width: `${getFlavorValue(flavor.key) * 10}%`,
                   }"
                 />
               </div>
               <p class="text-right text-sm text-gray-600 mt-1">
-                {{ sake.flavor_chart[flavor.key as keyof FlavorRating] }}
+                {{ getFlavorValue(flavor.key) }}
               </p>
             </div>
           </div>
