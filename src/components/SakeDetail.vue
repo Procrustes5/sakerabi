@@ -174,12 +174,12 @@ const getFlavorValue = (key: string): number => {
                 <div
                   class="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all duration-300"
                   :style="{
-                    width: `${getFlavorValue(flavor.key) * 10}%`,
+                    width: `${Math.floor(getFlavorValue(flavor.key) * 500) / 100 * 20}%`,
                   }"
                 />
               </div>
               <p class="text-right text-sm text-gray-600 mt-1">
-                {{ getFlavorValue(flavor.key) }}
+                {{ Math.floor(getFlavorValue(flavor.key) * 500) / 100 }}
               </p>
             </div>
           </div>

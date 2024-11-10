@@ -57,9 +57,19 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/sake',
+      name: 'sake-list',
+      component: () => import('@/views/pages/SakeListPage.vue')
+    },
+    {
       path: '/sake/:id',
       name: 'sake-detail',
       component: SakeDetail,
+    },
+    {
+      path: '/recommend',
+      name: 'sake-recommend',
+      component: () => import('@/views/pages/SakeRecommendationPage.vue')
     },
     {
       path: '/settings',
@@ -86,6 +96,14 @@ const router = createRouter({
       meta: { requiresAuth: false },
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    // ブラウザの戻る/進むボタンの場合は保存された位置を使用
+    if (savedPosition) {
+      return savedPosition
+    }
+    // それ以外の場合は最上部へスクロール
+    return { top: 0 }
+  }
 })
 
 // ナビゲーションガード

@@ -3,9 +3,9 @@ import { Calendar, Star, Book, Settings, Amphora, BookHeartIcon } from 'lucide-v
 import MenuItem from './MenuItem.vue'
 
 const menuItems = [
-  // { icon: Star, title: 'お気に入り' },
-  // { icon: BookHeartIcon, title: 'おすすめ' },
-  // { icon: Amphora, title: '日本酒' },
+  { icon: Star, title: 'お気に入り' },
+  { icon: BookHeartIcon, title: 'おすすめ' },
+  { icon: Amphora, title: '日本酒' },
   { icon: Book, title: '日本酒wiki' },
   { icon: Calendar, title: 'イベント' },
   { icon: Settings, title: '設定' },
