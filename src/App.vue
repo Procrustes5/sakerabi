@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from './utils/supabase'
+import ToastContainer from '@/components/ToastContainer.vue'
 
 const router = useRouter()
 
@@ -21,6 +22,7 @@ onMounted(() => {
 
 <template>
   <RouterView />
+  <ToastContainer />
 </template>
 
 <style scoped>

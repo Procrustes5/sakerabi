@@ -70,13 +70,7 @@ onMounted(() => {
     </div>
   </div>
 
-  <div v-else-if="error" class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <div class="p-4">
-      <p class="text-red-500 text-sm">{{ error }}</p>
-    </div>
-  </div>
-
-  <div v-else-if="!upcomingEvent" class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div v-else-if="!upcomingEvent || error" class="bg-white rounded-xl shadow-sm overflow-hidden">
     <div class="p-4">
       <div class="flex items-center space-x-4">
         <div class="bg-gray-100 p-3 rounded-lg">

@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/utils/supabase'
-import HomePage from '../views/pages/HomePage.vue'
-import WelcomePage from '../views/pages/WelcomePage.vue'
-import EventListView from '../views/pages/EventListPage.vue'
-import EventCreateView from '../views/pages/EventCreatePage.vue'
-import SettingsPage from '../views/pages/SettingsPage.vue'
+import HomePage from '@/views/pages/HomePage.vue'
+import WelcomePage from '@/views/pages/WelcomePage.vue'
+import EventListView from '@/views/pages/EventListPage.vue'
+import EventCreateView from '@/views/pages/EventCreatePage.vue'
+import SettingsPage from '@/views/pages/SettingsPage.vue'
+import SecurityPage from '@/views/pages/SecurityPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,12 @@ const router = createRouter({
       name: 'settings',
       component: SettingsPage,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/security',
+      name: 'security',
+      component: SecurityPage,
+      meta: { requiresAuth: false },
     },
   ],
 })
