@@ -5,7 +5,6 @@ import { supabase } from '@/utils/supabase'
 import { ArrowLeft, Star, Building2, MapPin, Droplets } from 'lucide-vue-next'
 import FlavorRating from './FlavorRating.vue'
 
-// 最小限のインターフェース定義
 interface SakeDetail {
   id: number
   name: string
@@ -32,6 +31,49 @@ const router = useRouter()
 const sake = ref<SakeDetail | null>(null)
 const isLoading = ref(true)
 const errorMessage = ref('')
+const isFavorite = ref(false)
+const isUpdatingFavorite = ref(false)
+
+// プロフィール情報を取得
+const getCurrentProfile = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) return null
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', session.user.id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching profile:', error)
+    return null
+  }
+
+  return profile
+}
+
+// お気に入り状態を取得
+const fetchFavoriteStatus = async () => {
+  try {
+    const profile = await getCurrentProfile()
+    if (!profile) return
+
+    const { data, error } = await supabase
+      .from('favorite_brands')
+      .select('id')
+      .eq('profile_id', profile.id)
+      .eq('brand_id', route.params.id)
+      .single()
+
+    if (error && error.code !== 'PGRST116') throw error // PGRST116 は結果が見つからない場合のエラー
+    isFavorite.value = !!data
+  } catch (error) {
+    console.error('Error fetching favorite status:', error)
+  }
+}
 
 const fetchSakeDetail = async () => {
   try {
@@ -64,17 +106,58 @@ const fetchSakeDetail = async () => {
 
     if (error) throw error
 
-    // 最低限name属性があることを確認
     if (!data?.name) {
       throw new Error('日本酒の名前が取得できませんでした')
     }
 
     sake.value = data
+    // お気に入り状態を取得
+    await fetchFavoriteStatus()
   } catch (error) {
     console.error('Error fetching sake details:', error)
     errorMessage.value = '日本酒の情報の取得に失敗しました'
   } finally {
     isLoading.value = false
+  }
+}
+
+// お気に入りの切り替え
+const toggleFavorite = async () => {
+  try {
+    isUpdatingFavorite.value = true
+    const profile = await getCurrentProfile()
+    if (!profile) {
+      // プロフィールが存在しない場合はログインページへリダイレクト
+      router.push('/login')
+      return
+    }
+
+    if (isFavorite.value) {
+      // お気に入りから削除
+      const { error } = await supabase
+        .from('favorite_brands')
+        .delete()
+        .eq('profile_id', profile.id)
+        .eq('brand_id', route.params.id)
+
+      if (error) throw error
+    } else {
+      // お気に入りに追加
+      const { error } = await supabase.from('favorite_brands').insert({
+        profile_id: profile.id,
+        brand_id: route.params.id,
+      })
+
+      if (error) throw error
+    }
+
+    // お気に入り状態を反転
+    isFavorite.value = !isFavorite.value
+  } catch (error) {
+    console.error('Error updating favorite:', error)
+    errorMessage.value = 'お気に入りの更新に失敗しました'
+  } finally {
+    isUpdatingFavorite.value = false
   }
 }
 
@@ -84,7 +167,9 @@ onMounted(() => {
 
 // フレーバーチャートの値を安全に取得するヘルパー関数
 const getFlavorValue = (key: string): number => {
-  return sake.value?.flavor_chart?.[key as keyof Required<NonNullable<SakeDetail['flavor_chart']>>] ?? 0
+  return (
+    sake.value?.flavor_chart?.[key as keyof Required<NonNullable<SakeDetail['flavor_chart']>>] ?? 0
+  )
 }
 </script>
 
@@ -100,8 +185,27 @@ const getFlavorValue = (key: string): number => {
           >
             <ArrowLeft class="w-6 h-6 text-gray-600" />
           </button>
-          <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Star class="w-6 h-6 text-gray-600" />
+          <button
+            @click="toggleFavorite"
+            class="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+            :disabled="isUpdatingFavorite"
+          >
+            <Star
+              class="w-6 h-6"
+              :class="{
+                'text-yellow-500 fill-yellow-500': isFavorite,
+                'text-gray-600': !isFavorite,
+              }"
+            />
+            <!-- ローディングインジケーター -->
+            <div
+              v-if="isUpdatingFavorite"
+              class="absolute inset-0 flex items-center justify-center"
+            >
+              <div
+                class="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"
+              ></div>
+            </div>
           </button>
         </div>
       </div>
@@ -143,7 +247,7 @@ const getFlavorValue = (key: string): number => {
           </div>
         </div>
 
-        <!-- フレーバーチャートが存在する場合のみ表示 -->
+        <!-- フレーバーチャート -->
         <div v-if="sake.flavor_chart" class="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div class="flex items-center gap-2 mb-6">
             <Droplets class="w-5 h-5 text-indigo-500" />
@@ -174,7 +278,7 @@ const getFlavorValue = (key: string): number => {
                 <div
                   class="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all duration-300"
                   :style="{
-                    width: `${Math.floor(getFlavorValue(flavor.key) * 500) / 100 * 20}%`,
+                    width: `${(Math.floor(getFlavorValue(flavor.key) * 500) / 100) * 20}%`,
                   }"
                 />
               </div>

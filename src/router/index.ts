@@ -59,7 +59,7 @@ const router = createRouter({
     {
       path: '/sake',
       name: 'sake-list',
-      component: () => import('@/views/pages/SakeListPage.vue')
+      component: () => import('@/views/pages/SakeListPage.vue'),
     },
     {
       path: '/sake/:id',
@@ -69,7 +69,12 @@ const router = createRouter({
     {
       path: '/recommend',
       name: 'sake-recommend',
-      component: () => import('@/views/pages/SakeRecommendationPage.vue')
+      component: () => import('@/views/pages/SakeRecommendationPage.vue'),
+    },
+    {
+      path: '/favorite',
+      name: 'sake-favorite',
+      component: () => import('@/views/pages/SakeFavoritePage.vue'),
     },
     {
       path: '/settings',
@@ -103,7 +108,7 @@ const router = createRouter({
     }
     // それ以外の場合は最上部へスクロール
     return { top: 0 }
-  }
+  },
 })
 
 // ナビゲーションガード

@@ -38,7 +38,7 @@ const observer = new IntersectionObserver(
       loadMore()
     }
   },
-  { threshold: 0.5 }
+  { threshold: 0.5 },
 )
 
 // 監視の開始と終了
@@ -67,7 +67,8 @@ const fetchInitialSakeList = async () => {
 
     const { data, error } = await supabase
       .from('brands')
-      .select(`
+      .select(
+        `
         id,
         name,
         brewery:brewery_id (
@@ -78,7 +79,8 @@ const fetchInitialSakeList = async () => {
             name
           )
         )
-      `)
+      `,
+      )
       .order('name', { ascending: true })
       .range(0, PER_PAGE - 1)
 
@@ -108,7 +110,8 @@ const loadMore = async () => {
 
     const { data, error } = await supabase
       .from('brands')
-      .select(`
+      .select(
+        `
         id,
         name,
         brewery:brewery_id (
@@ -119,7 +122,8 @@ const loadMore = async () => {
             name
           )
         )
-      `)
+      `,
+      )
       .order('name', { ascending: true })
       .range(start, end)
 
@@ -147,7 +151,8 @@ const handleSearch = async () => {
 
     const query = supabase
       .from('brands')
-      .select(`
+      .select(
+        `
         id,
         name,
         brewery:brewery_id (
@@ -158,7 +163,8 @@ const handleSearch = async () => {
             name
           )
         )
-      `)
+      `,
+      )
       .limit(50) // 検索時は多めに取得
 
     // 検索クエリがある場合のみ検索条件を追加
@@ -199,10 +205,7 @@ const handleBack = () => {
 
     <!-- ヘッダー部分 -->
     <div class="flex items-center mb-6 px-4 space-x-4">
-      <button
-        @click="handleBack"
-        class="p-2 hover:bg-gray-100 rounded-full transition-colors"
-      >
+      <button @click="handleBack" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
         <ArrowLeft class="w-6 h-6 text-gray-600" />
       </button>
       <h1 class="text-2xl font-bold text-gray-900">日本酒リスト</h1>
@@ -218,24 +221,15 @@ const handleBack = () => {
           class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-500 bg-white"
           @input="handleSearch"
         />
-        <Search
-          class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-        />
+        <Search class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
       </div>
     </div>
 
     <!-- エラーメッセージ -->
-    <ErrorDisplay
-      v-if="errorMessage"
-      :message="errorMessage"
-      :onRetry="fetchInitialSakeList"
-    />
+    <ErrorDisplay v-if="errorMessage" :message="errorMessage" :onRetry="fetchInitialSakeList" />
 
     <!-- 検索結果なし -->
-    <div
-      v-else-if="sakeList.length === 0"
-      class="text-center py-8 text-gray-600"
-    >
+    <div v-else-if="sakeList.length === 0" class="text-center py-8 text-gray-600">
       日本酒が見つかりませんでした
     </div>
 

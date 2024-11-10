@@ -18,6 +18,8 @@ const handleClick = () => {
     router.push('/sake')
   } else if (props.title === 'おすすめ') {
     router.push('/recommend')
+  } else if (props.title === 'お気に入り') {
+    router.push('/favorite')
   } else if (props.title === '日本酒wiki') {
     // 新しいタブで開き、より安全なrel属性を設定
     window.open('https://www.nihonshu.wiki/', '_blank', 'noopener,noreferrer')

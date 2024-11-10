@@ -21,13 +21,33 @@ interface SakeItem {
 }
 
 const router = useRouter()
-const searchQuery = ref('')
 const sakeList = ref<SakeItem[]>([])
 const isLoading = ref(false)
 const errorMessage = ref('')
 const hasMore = ref(true)
 const page = ref(0)
 const PER_PAGE = 20
+
+// プロフィール情報を取得
+const getCurrentProfile = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) return null
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', session.user.id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching profile:', error)
+    return null
+  }
+
+  return profile
+}
 
 // スクロール検知の設定
 const observerTarget = ref<HTMLElement | null>(null)
@@ -65,26 +85,44 @@ const fetchInitialSakeList = async () => {
     sakeList.value = []
     hasMore.value = true
 
+    const profile = await getCurrentProfile()
+    if (!profile) {
+      errorMessage.value = 'プロフィール情報の取得に失敗しました'
+      return
+    }
+
     const { data, error } = await supabase
-      .from('random_brands')
+      .from('favorite_brands')
       .select(
         `
-        id,
-        name,
-        brewery:brewery_id (
+        brand:brand_id (
           id,
           name,
-          area:area_id (
+          brewery:brewery_id (
             id,
-            name
+            name,
+            area:area_id (
+              id,
+              name
+            )
           )
         )
       `,
       )
+      .eq('profile_id', profile.id)
+      .order('created_at', { ascending: false })
       .range(0, PER_PAGE - 1)
 
     if (error) throw error
-    sakeList.value = data || []
+
+    // データを整形
+    sakeList.value =
+      data?.map((item) => ({
+        id: item.brand.id,
+        name: item.brand.name,
+        brewery: item.brand.brewery,
+      })) || []
+
     hasMore.value = data.length === PER_PAGE
     page.value = 1
 
@@ -100,36 +138,52 @@ const fetchInitialSakeList = async () => {
 
 // 追加データの読み込み
 const loadMore = async () => {
-  if (!hasMore.value || isLoading.value || searchQuery.value.trim()) return
+  if (!hasMore.value || isLoading.value) return
 
   try {
     isLoading.value = true
     const start = page.value * PER_PAGE
     const end = start + PER_PAGE - 1
 
+    const profile = await getCurrentProfile()
+    if (!profile) {
+      errorMessage.value = 'プロフィール情報の取得に失敗しました'
+      return
+    }
+
     const { data, error } = await supabase
-      .from('random_brands')
+      .from('favorite_brands')
       .select(
         `
-        id,
-        name,
-        brewery:brewery_id (
+        brand:brand_id (
           id,
           name,
-          area:area_id (
+          brewery:brewery_id (
             id,
-            name
+            name,
+            area:area_id (
+              id,
+              name
+            )
           )
         )
       `,
       )
-      .order('name', { ascending: true })
+      .eq('profile_id', profile.id)
+      .order('created_at', { ascending: false })
       .range(start, end)
 
     if (error) throw error
 
     if (data) {
-      sakeList.value = [...sakeList.value, ...data]
+      // データを整形
+      const newItems = data.map((item) => ({
+        id: item.brand.id,
+        name: item.brand.name,
+        brewery: item.brand.brewery,
+      }))
+
+      sakeList.value = [...sakeList.value, ...newItems]
       hasMore.value = data.length === PER_PAGE
       page.value++
     }
@@ -160,7 +214,7 @@ const handleBack = () => {
       <button @click="handleBack" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
         <ArrowLeft class="w-6 h-6 text-gray-600" />
       </button>
-      <h1 class="text-2xl font-bold text-gray-900">おすすめ</h1>
+      <h1 class="text-2xl font-bold text-gray-900">お気に入り</h1>
     </div>
 
     <!-- エラーメッセージ -->
@@ -168,7 +222,7 @@ const handleBack = () => {
 
     <!-- 検索結果なし -->
     <div v-else-if="sakeList.length === 0" class="text-center py-8 text-gray-600">
-      日本酒が見つかりませんでした
+      お気に入りの日本酒がありません
     </div>
 
     <!-- 日本酒リスト -->
@@ -202,20 +256,9 @@ const handleBack = () => {
       </div>
 
       <!-- Intersection Observer のターゲット要素 -->
-      <div
-        v-if="hasMore && !searchQuery"
-        ref="observerTarget"
-        class="h-20 flex items-center justify-center"
-      >
+      <div v-if="hasMore" ref="observerTarget" class="h-20 flex items-center justify-center">
         <LoadingSpinner v-if="isLoading" />
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-input {
-  font-size: 16px !important;
-  -webkit-text-size-adjust: 100%;
-}
-</style>
