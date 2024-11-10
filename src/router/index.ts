@@ -6,6 +6,7 @@ import EventListView from '@/views/pages/EventListPage.vue'
 import EventCreateView from '@/views/pages/EventCreatePage.vue'
 import SettingsPage from '@/views/pages/SettingsPage.vue'
 import SecurityPage from '@/views/pages/SecurityPage.vue'
+import AuthCallback from '@/components/AuthCallback.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,12 @@ const router = createRouter({
       name: 'welcome',
       component: WelcomePage,
       meta: { requiresUnauth: true },
+    },
+    {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: AuthCallback,
+      meta: { requiresAuth: false }, // コールバックページは認証チェックをスキップ
     },
     {
       path: '/events',
