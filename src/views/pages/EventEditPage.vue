@@ -5,6 +5,7 @@ import { ArrowLeft, Trash2 } from 'lucide-vue-next'
 import LoadingSpinner from '../../components/LoadingSpinner.vue'
 import ErrorDisplay from '../../components/ErrorDisplay.vue'
 import { supabase } from '@/utils/supabase'
+import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal.vue'
 
 interface EventForm {
   name: string
@@ -207,29 +208,11 @@ onMounted(() => {
     </div>
 
     <!-- 削除確認モーダル -->
-    <div
-      v-if="showDeleteConfirm"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-    >
-      <div class="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">イベントを削除しますか？</h3>
-        <p class="text-gray-600 mb-6">この操作は取り消すことができません。</p>
-        <div class="flex justify-end gap-4">
-          <button
-            @click="showDeleteConfirm = false"
-            class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-          >
-            キャンセル
-          </button>
-          <button
-            @click="handleDelete"
-            :disabled="isSubmitting"
-            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {{ isSubmitting ? '削除中...' : '削除する' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <DeleteConfirmModal
+      v-model="showDeleteConfirm"
+      title="イベントを削除しますか？"
+      :is-submitting="isSubmitting"
+      @confirm="handleDelete"
+    />
   </div>
 </template>

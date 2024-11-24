@@ -305,6 +305,7 @@ onMounted(() => {
             userName: review.profile.display_name,
             timestamp: formatTimestamp(review.created_at),
             sakeName: review.event_brand.brand.name,
+            sakeId: review.event_brand.brand.id,
             rating: calculateRating(review),
             content: review.comment,
             image: review.image_url,
@@ -316,6 +317,7 @@ onMounted(() => {
               date: review.event_brand.event.date,
               location: review.event_brand.event.location,
             },
+            profileId: review.profile.id,
           }"
           class="review-card"
           :class="{ 'last-review': index === reviews.length - 1 }"

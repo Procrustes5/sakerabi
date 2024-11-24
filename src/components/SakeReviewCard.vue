@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Heart, MessageCircle, Share2, Loader2, Send } from 'lucide-vue-next'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { Heart, MessageCircle, Share2, Loader2, Send, MoreVertical } from 'lucide-vue-next'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { supabase } from '@/utils/supabase'
 import { notifyOnComment } from '@/utils/notificationHelper'
+import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal.vue'
+import UserProfileModal from '@/components/modals/UserProfileModal.vue'
 
 interface Event {
   name: string
@@ -25,6 +27,7 @@ interface ReviewProps {
   comments: number
   isLiked?: boolean
   event: Event
+  profileId: string
 }
 
 interface Comment {
@@ -40,12 +43,19 @@ interface Comment {
   }
 }
 
+interface DeleteTarget {
+  id: string
+  content: string
+}
+
 const props = defineProps<{
   review: ReviewProps
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle-like', id: string): void
+  (e: 'delete-review', id: string): void
+  (e: 'update-review', review: Partial<ReviewProps>): void
 }>()
 
 const isCommentsOpen = ref(false)
@@ -54,7 +64,40 @@ const newComment = ref('')
 const isSubmitting = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
-const currentUser = ref<any>(null)
+const currentUser = ref<Profile>(null)
+const showDeleteConfirm = ref(false)
+const deleteTarget = ref<DeleteTarget | null>(null)
+const isDeletingComment = ref(false)
+const showEditModal = ref(false)
+const showOptions = ref(false)
+const isDeleting = ref(false)
+const showDeleteReviewConfirm = ref(false)
+const showProfileModal = ref(false)
+
+const getCurrentProfile = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) return null
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', session.user.id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching profile:', error)
+    return null
+  }
+
+  currentUser.value = profile
+}
+
+// 投稿者チェック
+const isCurrentUserAuthor = computed(() => {
+  return currentUser?.value?.id === props.review.profileId
+})
 
 // コメントの取得
 const fetchComments = async () => {
@@ -157,14 +200,17 @@ const submitComment = async () => {
 }
 
 // コメントの削除
-const deleteComment = async (commentId: string) => {
-  if (!currentUser.value) return
+const deleteComment = async () => {
+  if (!currentUser.value || !deleteTarget.value) return
 
   try {
+    isDeletingComment.value = true
+    error.value = null
+
     const { error: deleteError } = await supabase
       .from('sake_rating_comments')
       .delete()
-      .eq('id', commentId)
+      .eq('id', deleteTarget.value.id)
       .eq('profile_id', currentUser.value.id)
 
     if (deleteError) throw deleteError
@@ -181,7 +227,45 @@ const deleteComment = async (commentId: string) => {
   } catch (e) {
     console.error('Error deleting comment:', e)
     error.value = 'コメントの削除に失敗しました'
+  } finally {
+    isDeletingComment.value = false
+    showDeleteConfirm.value = false
+    deleteTarget.value = null
   }
+}
+
+// レビューの削除
+const deleteReview = async () => {
+  if (!currentUser.value || !isCurrentUserAuthor.value) return
+
+  try {
+    isDeleting.value = true
+
+    const { error: deleteError } = await supabase
+      .from('sake_flavor_ratings')
+      .delete()
+      .eq('id', props.review.id)
+      .eq('profile_id', currentUser.value.id)
+
+    if (deleteError) throw deleteError
+
+    emit('delete-review', props.review.id)
+  } catch (e) {
+    console.error('Error deleting review:', e)
+    error.value = 'レビューの削除に失敗しました'
+  } finally {
+    isDeleting.value = false
+    showDeleteReviewConfirm.value = false
+  }
+}
+
+// レビューの更新
+const handleUpdateReview = (updatedReview: Partial<ReviewProps>) => {
+  emit('update-review', {
+    id: props.review.id,
+    ...updatedReview
+  })
+  showEditModal.value = false
 }
 
 // コメントセクションの開閉
@@ -193,10 +277,47 @@ const toggleComments = async () => {
   }
 }
 
+// オプションメニューを閉じる
+const closeOptions = () => {
+  showOptions.value = false
+}
+
+// オプションメニューの外側クリック処理
+const handleClickOutside = (event: MouseEvent) => {
+  const optionsMenu = document.getElementById(`options-menu-${props.review.id}`)
+  if (optionsMenu && !optionsMenu.contains(event.target as Node)) {
+    closeOptions()
+  }
+}
+
 // タイムスタンプのフォーマット
 const formatTimestamp = (timestamp: string): string => {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ja })
 }
+
+// コメント削除の確認
+const confirmDeleteComment = (comment: Comment) => {
+  deleteTarget.value = {
+    id: comment.id,
+    content: comment.content
+  }
+  showDeleteConfirm.value = true
+}
+
+// 画像読み込みエラー処理
+const handleImageError = (event: Event) => {
+  const imgElement = event.target as HTMLImageElement
+  imgElement.src = '/images/default-avatar.png' // デフォルトのアバター画像パスに置き換えてください
+}
+
+onMounted(() => {
+  getCurrentProfile();
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -208,16 +329,44 @@ const formatTimestamp = (timestamp: string): string => {
       <!-- ユーザー情報 -->
       <div class="flex items-start justify-between">
         <div class="flex items-center space-x-3">
-          <img
-            :src="review.userImage"
-            :alt="review.userName"
-            class="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
+          <button
+            class="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            @click="showProfileModal = true"
+          >
+            <img
+              :src="review.userImage"
+              :alt="review.userName"
+              class="w-10 h-10 rounded-full object-cover"
+            />
+          </button>
+          <div class="text-left">
             <div class="font-medium text-gray-900">
               {{ review.userName }}
             </div>
             <p class="text-sm text-gray-500">{{ review.timestamp }}</p>
+          </div>
+        </div>
+        <div v-if="isCurrentUserAuthor" class="relative">
+          <button
+            @click.stop="showOptions = !showOptions"
+            class="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <MoreVertical class="w-5 h-5 text-gray-500" />
+          </button>
+          <!-- ドロップダウンメニュー -->
+          <div
+            v-if="showOptions"
+            :id="`options-menu-${review.id}`"
+            class="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 border"
+          >
+            <div class="py-1">
+              <button
+                @click="showDeleteReviewConfirm = true; closeOptions()"
+                class="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left"
+              >
+                削除
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -318,7 +467,7 @@ const formatTimestamp = (timestamp: string): string => {
             <!-- 削除ボタン（自分のコメントの場合） -->
             <button
               v-if="currentUser?.id === comment.profile_id"
-              @click="deleteComment(comment.id)"
+              @click="confirmDeleteComment(comment)"
               class="text-xs text-gray-500 hover:text-red-500 mt-1 ml-1"
             >
               削除
@@ -353,5 +502,26 @@ const formatTimestamp = (timestamp: string): string => {
         </div>
       </div>
     </div>
+    <!-- レビュー削除確認モーダル -->
+    <DeleteConfirmModal
+      v-model="showDeleteReviewConfirm"
+      title="レビューを削除しますか？"
+      :is-submitting="isDeleting"
+      @confirm="deleteReview"
+    />
+
+    <!-- コメント削除確認モーダル -->
+    <DeleteConfirmModal
+      v-model="showDeleteConfirm"
+      title="コメントを削除しますか？"
+      :is-submitting="isDeletingComment"
+      @confirm="deleteComment"
+    />
+
+    <!-- プロフィールモーダル -->
+    <UserProfileModal
+      v-model="showProfileModal"
+      :profile-id="review.profileId"
+    />
   </div>
 </template>
