@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { Search, ArrowLeft, Store, MapPin } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
@@ -31,39 +31,74 @@ const PER_PAGE = 20
 
 // スクロール検知の設定
 const observerTarget = ref<HTMLElement | null>(null)
-const observer = new IntersectionObserver(
-  (entries) => {
-    const first = entries[0]
-    if (first.isIntersecting) {
-      loadMore()
+let observer: IntersectionObserver | null = null
+
+// データ取得中かどうかのフラグ
+const isFetching = ref(false)
+
+// 監視の設定と開始
+const setupObserver = () => {
+  if (observer) {
+    observer.disconnect()
+  }
+
+  observer = new IntersectionObserver(
+    async (entries) => {
+      const target = entries[0]
+      if (target.isIntersecting && !isFetching.value && hasMore.value && !searchQuery.value.trim()) {
+        await loadMore()
+      }
+    },
+    {
+      rootMargin: '200px',
+      threshold: 0
     }
-  },
-  { threshold: 0.5 },
-)
+  )
 
-// 監視の開始と終了
-onMounted(() => {
-  fetchInitialSakeList()
-})
-
-const startObserver = () => {
   if (observerTarget.value) {
     observer.observe(observerTarget.value)
   }
 }
 
-const stopObserver = () => {
-  observer.disconnect()
-}
+// 監視の開始
+onMounted(async () => {
+  await fetchInitialSakeList()
+  await nextTick(() => {
+    setupObserver()
+  })
+})
+
+// 監視の終了
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+})
+
+// 検索クエリの監視
+watch(searchQuery, async (newQuery) => {
+  if (newQuery.trim()) {
+    if (observer) {
+      observer.disconnect()
+    }
+  } else {
+    await nextTick(() => {
+      setupObserver()
+    })
+  }
+})
 
 // 初期データの取得
 const fetchInitialSakeList = async () => {
+  if (isFetching.value) return
+
   try {
+    isFetching.value = true
     isLoading.value = true
     errorMessage.value = ''
     page.value = 0
     sakeList.value = []
-    hasMore.value = true
 
     const { data, error } = await supabase
       .from('brands')
@@ -85,25 +120,29 @@ const fetchInitialSakeList = async () => {
       .range(0, PER_PAGE - 1)
 
     if (error) throw error
+
     sakeList.value = data || []
     hasMore.value = data.length === PER_PAGE
     page.value = 1
 
-    // 監視を開始
-    startObserver()
+    await nextTick(() => {
+      setupObserver()
+    })
   } catch (error) {
     console.error('Fetch error:', error)
     errorMessage.value = 'データの取得中にエラーが発生しました'
   } finally {
     isLoading.value = false
+    isFetching.value = false
   }
 }
 
 // 追加データの読み込み
 const loadMore = async () => {
-  if (!hasMore.value || isLoading.value || searchQuery.value.trim()) return
+  if (isFetching.value || !hasMore.value || searchQuery.value.trim()) return
 
   try {
+    isFetching.value = true
     isLoading.value = true
     const start = page.value * PER_PAGE
     const end = start + PER_PAGE - 1
@@ -130,24 +169,37 @@ const loadMore = async () => {
     if (error) throw error
 
     if (data) {
-      sakeList.value = [...sakeList.value, ...data]
+      const existingIds = new Set(sakeList.value.map(item => item.id))
+      const newItems = data.filter(item => !existingIds.has(item.id))
+
+      if (newItems.length > 0) {
+        sakeList.value = [...sakeList.value, ...newItems]
+        page.value++
+      }
+
       hasMore.value = data.length === PER_PAGE
-      page.value++
+
+      await nextTick(() => {
+        setupObserver()
+      })
     }
   } catch (error) {
     console.error('Load more error:', error)
     errorMessage.value = '追加データの取得中にエラーが発生しました'
   } finally {
     isLoading.value = false
+    isFetching.value = false
   }
 }
 
 // 検索処理
 const handleSearch = async () => {
+  if (isFetching.value) return
+
   try {
+    isFetching.value = true
     isLoading.value = true
     errorMessage.value = ''
-    stopObserver()
 
     const query = supabase
       .from('brands')
@@ -165,31 +217,36 @@ const handleSearch = async () => {
         )
       `,
       )
-      .limit(50) // 検索時は多めに取得
+      .limit(50)
 
-    // 検索クエリがある場合のみ検索条件を追加
     if (searchQuery.value.trim()) {
       query.ilike('name', `%${searchQuery.value}%`)
     } else {
       query.order('name', { ascending: true })
-      startObserver()
     }
 
     const { data, error } = await query
 
     if (error) throw error
+
     sakeList.value = data || []
-    // 検索時は無限スクロールを無効化
     hasMore.value = !searchQuery.value.trim()
+    page.value = 1
+
+    if (!searchQuery.value.trim()) {
+      await nextTick(() => {
+        setupObserver()
+      })
+    }
   } catch (error) {
     console.error('Search error:', error)
     errorMessage.value = '検索中にエラーが発生しました'
   } finally {
     isLoading.value = false
+    isFetching.value = false
   }
 }
 
-// 詳細ページへの遷移
 const navigateToDetail = (sake: SakeItem) => {
   router.push(`/sake/${sake.id}`)
 }
@@ -243,12 +300,9 @@ const handleBack = () => {
       >
         <div class="flex items-start space-x-4">
           <div class="flex-grow">
-            <!-- 日本酒名 -->
             <h2 class="text-xl font-semibold text-gray-900 mb-3">
               {{ sake.name }}
             </h2>
-
-            <!-- 酒蔵情報 -->
             <div class="space-y-2">
               <div class="flex items-center gap-2 text-gray-600">
                 <Store class="w-5 h-5" />
@@ -265,9 +319,9 @@ const handleBack = () => {
 
       <!-- Intersection Observer のターゲット要素 -->
       <div
-        v-if="hasMore && !searchQuery"
+        v-if="hasMore && !searchQuery.trim()"
         ref="observerTarget"
-        class="h-20 flex items-center justify-center"
+        class="mt-12 h-20 flex items-center justify-center"
       >
         <LoadingSpinner v-if="isLoading" />
       </div>
