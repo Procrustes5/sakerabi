@@ -55,7 +55,7 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto bg-gray-50 px-4 py-6">
+  <div class="mx-auto bg-gray-50 px-4 py-6">
     <button @click="goBack" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6">
       <ArrowLeft class="w-5 h-5" />
       <span>戻る</span>

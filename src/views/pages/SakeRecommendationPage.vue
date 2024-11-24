@@ -152,7 +152,7 @@ const handleBack = () => {
 </script>
 
 <template>
-  <div class="max-w-3xl mx-auto bg-gray-50 min-h-screen pb-8">
+  <div class="mx-auto bg-gray-50 min-h-screen pb-8">
     <AppHeader />
 
     <!-- ヘッダー部分 -->

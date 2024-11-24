@@ -78,7 +78,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="aspect-square overflow-hidden rounded-xl shadow-sm bg-white relative">
+  <div class="w-full recommend aspect-square overflow-hidden rounded-xl shadow-sm bg-white relative">
     <LoadingSpinner v-if="isLoading" />
 
     <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="retryLoad" />
@@ -165,6 +165,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.recommend {
+  max-height: calc(100vh - 100px);
+  display: flex;
+  justify-content: center;
+}
+
 .bg-pattern {
   background-image: radial-gradient(
     circle at 1px 1px,

@@ -183,7 +183,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-3xl mx-auto bg-gray-50 min-h-screen">
+  <div class="mx-auto bg-gray-50 min-h-screen">
     <AppHeader />
 
     <LoadingSpinner v-if="isLoading" />

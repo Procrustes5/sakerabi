@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import { ArrowLeft, Star, Building2, MapPin, Droplets } from 'lucide-vue-next'
 import FlavorRating from './FlavorRating.vue'
+import SakeBrandReviews from './SakeBrandReviews.vue'
+import SakeDetailModal from './modals/SakeDetailModal.vue'
 
 interface SakeDetail {
   id: number
@@ -33,13 +35,35 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const isFavorite = ref(false)
 const isUpdatingFavorite = ref(false)
+const isRatingModalOpen = ref(false)
+const isSubmitting = ref(false)
+const reviewsRef = ref()
 
-const flavorChartValue = computed(() =>
-  Object.fromEntries(
+// モーダルを開く
+const openRatingModal = () => {
+  isRatingModalOpen.value = true
+}
+
+// モーダルを閉じる
+const closeRatingModal = () => {
+  isRatingModalOpen.value = false
+}
+
+// 評価送信後の処理
+const handleRatingSubmit = () => {
+  // レビュー一覧を再取得
+  if (reviewsRef.value) {
+    reviewsRef.value.fetchInitialReviews()
+  }
+}
+
+const flavorChartValue = computed(() => {
+  if (!sake.value?.flavor_chart) return {}
+  return Object.fromEntries(
     Object.entries(sake.value.flavor_chart)
       .map(([k, v]) => [k, v * 5])
   )
-)
+})
 
 // プロフィール情報を取得
 const getCurrentProfile = async () => {
@@ -235,9 +259,9 @@ const getFlavorValue = (key: string): number => {
         </div>
       </div>
 
-      <div v-else-if="sake" class="max-w-7xl mx-auto px-4">
+      <div v-else-if="sake" class="space-y-6">
         <!-- 基本情報 -->
-        <div class="space-y-6 mb-8">
+        <div class="max-w-7xl mx-auto px-4">
           <div class="bg-white rounded-2xl p-6 shadow-sm">
             <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ sake.name }}</h1>
             <!-- 蔵元情報が存在する場合のみ表示 -->
@@ -255,46 +279,68 @@ const getFlavorValue = (key: string): number => {
         </div>
 
         <!-- フレーバーチャート -->
-        <div v-if="sake.flavor_chart" class="bg-white rounded-2xl p-6 shadow-sm mb-6">
-          <div class="flex items-center gap-2 mb-6">
-            <Droplets class="w-5 h-5 text-indigo-500" />
-            <h3 class="text-lg font-medium text-gray-900">味わいチャート</h3>
-          </div>
+        <div v-if="sake.flavor_chart" class="max-w-7xl mx-auto px-4">
+          <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-6">
+              <Droplets class="w-5 h-5 text-indigo-500" />
+              <h3 class="text-lg font-medium text-gray-900">味わいチャート</h3>
+            </div>
 
-          <!-- 六角形のチャート -->
-          <div class="flex justify-center mb-12">
-            <FlavorRating :values="flavorChartValue" :size="280" />
-          </div>
+            <!-- 六角形のチャート -->
+            <div class="flex justify-center mb-12">
+              <FlavorRating :values="flavorChartValue" :size="280" />
+            </div>
 
-          <!-- バーチャート -->
-          <div class="grid grid-cols-2 gap-4">
-            <div
-              v-for="flavor in [
-                { key: 'f1_hanayaka', name: '華やか' },
-                { key: 'f2_houjun', name: '芳醇' },
-                { key: 'f3_juukou', name: '重厚' },
-                { key: 'f4_odayaka', name: '穏やか' },
-                { key: 'f5_dry', name: 'ドライ' },
-                { key: 'f6_keiikai', name: '軽快' },
-              ]"
-              :key="flavor.key"
-              class="bg-gray-50 rounded-xl p-4"
-            >
-              <p class="text-sm text-gray-500 mb-1">{{ flavor.name }}</p>
-              <div class="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  class="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all duration-300"
-                  :style="{
-                    width: `${(Math.floor(getFlavorValue(flavor.key) * 500) / 100) * 20}%`,
-                  }"
-                />
+            <!-- バーチャート -->
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                v-for="flavor in [
+                  { key: 'f1_hanayaka', name: '華やか' },
+                  { key: 'f2_houjun', name: '芳醇' },
+                  { key: 'f3_juukou', name: '重厚' },
+                  { key: 'f4_odayaka', name: '穏やか' },
+                  { key: 'f5_dry', name: 'ドライ' },
+                  { key: 'f6_keiikai', name: '軽快' },
+                ]"
+                :key="flavor.key"
+                class="bg-gray-50 rounded-xl p-4"
+              >
+                <p class="text-sm text-gray-500 mb-1">{{ flavor.name }}</p>
+                <div class="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    class="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all duration-300"
+                    :style="{
+                      width: `${(Math.floor(getFlavorValue(flavor.key) * 500) / 100) * 20}%`,
+                    }"
+                  />
+                </div>
+                <p class="text-right text-sm text-gray-600 mt-1">
+                  {{ Math.floor(getFlavorValue(flavor.key) * 500) / 100 }}
+                </p>
               </div>
-              <p class="text-right text-sm text-gray-600 mt-1">
-                {{ Math.floor(getFlavorValue(flavor.key) * 500) / 100 }}
-              </p>
             </div>
           </div>
         </div>
+
+        <!-- 評価一覧 -->
+        <div class="mt-6">
+          <SakeBrandReviews
+            ref="reviewsComponent"
+            :brand-id="Number(route.params.id)"
+            @add-review="openRatingModal"
+          />
+        </div>
+
+        <!-- 評価モーダル -->
+        <SakeDetailModal
+          v-if="sake"
+          :is-open="isRatingModalOpen"
+          :brand-id="Number(route.params.id)"
+          :brand-name="sake.name"
+          :brewery-name="sake.brewery?.name || ''"
+          @close="closeRatingModal"
+          @submit="handleRatingSubmit"
+        />
       </div>
     </main>
   </div>
