@@ -3,8 +3,8 @@ import { ref, onMounted, nextTick } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import SakeReviewCard from './SakeReviewCard.vue'
 import { Loader2 } from 'lucide-vue-next'
+import SakeReviewCard from './SakeReviewCard.vue'
 
 interface Review {
   id: string
@@ -43,7 +43,6 @@ const isLoading = ref(false)
 const hasMore = ref(true)
 const refreshing = ref(false)
 const error = ref<string | null>(null)
-const showCommentModal = ref<boolean>(false)
 const PAGE_SIZE = 10
 
 // 評価の平均値を計算して5段階に変換
@@ -57,7 +56,7 @@ const calculateRating = (review: Review): number => {
     review.f6_keiikai,
   ]
   const avg = values.reduce((a, b) => a + b, 0) / values.length
-  return Math.round((avg / 100) * 5) // 100段階を5段階に変換
+  return Math.round((avg / 100) * 5)
 }
 
 // タイムスタンプのフォーマット
@@ -75,8 +74,7 @@ const fetchInitialReviews = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(
-        `
+      .select(`
         id,
         profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands(
@@ -95,8 +93,7 @@ const fetchInitialReviews = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `,
-      )
+      `)
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE)
 
@@ -141,14 +138,13 @@ const loadMore = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(
-        `
+      .select(`
         id,
-        profile:profiles(id, username, avatar_url),
+        profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands(
           id,
-          brand:sake_brands(name),
-          event:sake_events(name, date, location)
+          brand:brands(name),
+          event:events(name, date, location)
         ),
         comment,
         image_url,
@@ -161,8 +157,7 @@ const loadMore = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `,
-      )
+      `)
       .order('created_at', { ascending: false })
       .lt('created_at', lastReview.created_at)
       .limit(PAGE_SIZE)
@@ -208,14 +203,6 @@ const onRefresh = async () => {
   }
 }
 
-// Intersection Observer for infinite scroll
-const observeLastElement = (entries: IntersectionObserverEntry[]) => {
-  const lastEntry = entries[entries.length - 1]
-  if (lastEntry.isIntersecting) {
-    loadMore()
-  }
-}
-
 // いいねの切り替え
 const toggleLike = async (reviewId: string) => {
   try {
@@ -243,10 +230,12 @@ const toggleLike = async (reviewId: string) => {
 
       if (deleteError) throw deleteError
     } else {
-      const { error: insertError } = await supabase.from('sake_rating_likes').insert({
-        profile_id: userData.user.id,
-        rating_id: reviewId,
-      })
+      const { error: insertError } = await supabase
+        .from('sake_rating_likes')
+        .insert({
+          profile_id: userData.user.id,
+          rating_id: reviewId,
+        })
 
       if (insertError) throw insertError
     }
@@ -259,6 +248,14 @@ const toggleLike = async (reviewId: string) => {
     }
     error.value = 'いいねの処理に失敗しました'
     console.error('Error toggling like:', e)
+  }
+}
+
+// Intersection Observer for infinite scroll
+const observeLastElement = (entries: IntersectionObserverEntry[]) => {
+  const lastEntry = entries[entries.length - 1]
+  if (lastEntry.isIntersecting) {
+    loadMore()
   }
 }
 
@@ -289,6 +286,11 @@ onMounted(() => {
       <Loader2 class="w-6 h-6 text-gray-600 animate-spin" />
     </div>
 
+    <!-- エラー表示 -->
+    <div v-if="error" class="px-4 py-2 bg-red-100 text-red-700 rounded-md mb-4">
+      {{ error }}
+    </div>
+
     <!-- レビューリスト -->
     <div class="space-y-4 px-4">
       <template v-if="reviews.length > 0">
@@ -316,22 +318,28 @@ onMounted(() => {
           class="review-card"
           :class="{ 'last-review': index === reviews.length - 1 }"
           @toggle-like="toggleLike(review.id)"
-          @show-comments="showCommentModal = true"
         />
-
-        <!--        <SakeCommentModal-->
-        <!--          :is-open="showCommentModal"-->
-        <!--          @close="showCommentModal = false"-->
-        <!--         rating-id="1"/>-->
       </template>
 
       <!-- 空の状態 -->
-      <div v-else-if="!isLoading" class="text-center py-8 text-gray-500">まだ評価がありません</div>
+      <div v-else-if="!isLoading" class="text-center py-8 text-gray-500">
+        まだ評価がありません
+      </div>
     </div>
 
     <!-- ローディングインジケーター -->
     <div v-if="isLoading && !refreshing" class="flex justify-center items-center py-4">
       <Loader2 class="w-6 h-6 text-gray-600 animate-spin" />
+    </div>
+
+    <!-- さらに読み込むボタン -->
+    <div v-if="hasMore && !isLoading" class="flex justify-center mt-4">
+      <button
+        @click="loadMore"
+        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+      >
+        さらに読み込む
+      </button>
     </div>
   </div>
 </template>
