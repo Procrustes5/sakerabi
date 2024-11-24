@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { X } from 'lucide-vue-next'
-import SakeSearch, { type SearchResult } from './SakeSearch.vue'
+import SakeSearch, { type SearchResult } from '../SakeSearch.vue'
 
 interface Props {
   isOpen: boolean

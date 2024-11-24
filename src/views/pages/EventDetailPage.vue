@@ -6,8 +6,8 @@ import { Calendar, MapPin, Plus, Pencil, Camera } from 'lucide-vue-next'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ErrorDisplay from '@/components/ErrorDisplay.vue'
 import AppHeader from '@/components/AppHeader.vue'
-import SakeRatingModal from '@/components/SakeRatingModal.vue'
-import SakeAddModal from '@/components/SakeAddModal.vue'
+import SakeRatingModal from '@/components/modals/SakeRatingModal.vue'
+import SakeAddModal from '@/components/modals/SakeAddModal.vue'
 import FlavorRating from '@/components/FlavorRating.vue'
 
 interface Event {

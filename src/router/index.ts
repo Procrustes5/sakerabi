@@ -4,13 +4,13 @@ import HomePage from '@/views/pages/HomePage.vue'
 import WelcomePage from '@/views/pages/WelcomePage.vue'
 import EventListView from '@/views/pages/EventListPage.vue'
 import EventCreateView from '@/views/pages/EventCreatePage.vue'
-import SettingsPage from '@/views/pages/SettingsPage.vue'
-import SecurityPage from '@/views/pages/SecurityPage.vue'
+import SettingsPage from '@/views/pages/settings/SettingsPage.vue'
+import SecurityPage from '@/views/pages/settings/SecurityPage.vue'
 import AuthCallback from '@/components/AuthCallback.vue'
-import AccountPage from '@/views/pages/AccountPage.vue'
-import HelpPage from '@/views/pages/HelpPage.vue'
+import AccountPage from '@/views/pages/settings/AccountPage.vue'
+import HelpPage from '@/views/pages/settings/HelpPage.vue'
 import SakeDetail from '@/components/SakeDetail.vue'
-import NotificationsPage from '@/views/pages/NotificationsPage.vue'
+import NotificationsPage from '@/views/pages/settings/NotificationsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

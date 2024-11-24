@@ -4,7 +4,7 @@ import { Bell, Search, X, ExternalLink } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import Logo from '../assets/logo.svg'
 import { useNotification } from '@/composables/useNotification'
-import SakeSearchModal from '@/components/SakeSearchModal.vue'
+import SakeSearchModal from '@/components/modals/SakeSearchModal.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
 
