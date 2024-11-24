@@ -4,6 +4,7 @@ import { Heart, MessageCircle, Share2, Loader2, Send } from 'lucide-vue-next'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { supabase } from '@/utils/supabase'
+import { notifyOnComment } from '@/utils/notificationHelper'
 
 interface Event {
   name: string
@@ -110,23 +111,35 @@ const submitComment = async () => {
     isSubmitting.value = true
     error.value = null
 
-    const { error: insertError } = await supabase
+    // コメントの投稿
+    const { data: commentData, error: insertError } = await supabase
       .from('sake_rating_comments')
       .insert({
         rating_id: props.review.id,
         profile_id: currentUser.value.id,
         content: newComment.value.trim(),
       })
+      .select()
+      .single()
 
     if (insertError) throw insertError
 
-    // コメント投稿後にコメント数を更新
+    // コメント数の更新
     await supabase
       .from('sake_flavor_ratings')
       .update({
         comments_count: comments.value.length + 1,
       })
       .eq('id', props.review.id)
+
+    // 通知の送信
+    if (commentData) {
+      await notifyOnComment(
+        Number(props.review.id), // rating_id
+        commentData.id,          // comment_id
+        currentUser.value.id     // actor_id
+      )
+    }
 
     newComment.value = ''
     await fetchComments()

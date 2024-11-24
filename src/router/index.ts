@@ -10,6 +10,7 @@ import AuthCallback from '@/components/AuthCallback.vue'
 import AccountPage from '@/views/pages/AccountPage.vue'
 import HelpPage from '@/views/pages/HelpPage.vue'
 import SakeDetail from '@/components/SakeDetail.vue'
+import NotificationsPage from '@/views/pages/NotificationsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -93,6 +94,12 @@ const router = createRouter({
       name: 'security',
       component: SecurityPage,
       meta: { requiresAuth: false },
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: NotificationsPage,
+      meta: { requiresAuth: true },
     },
     {
       path: '/help',
