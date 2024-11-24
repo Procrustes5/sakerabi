@@ -79,10 +79,12 @@ onUnmounted(() => {
 // 検索クエリの監視
 watch(searchQuery, async (newQuery) => {
   if (newQuery.trim()) {
+    await handleSearch()
     if (observer) {
       observer.disconnect()
     }
   } else {
+    await fetchInitialSakeList()
     await nextTick(() => {
       setupObserver()
     })
@@ -254,6 +256,14 @@ const navigateToDetail = (sake: SakeItem) => {
 const handleBack = () => {
   router.back()
 }
+
+const handlePaste = async (event: ClipboardEvent) => {
+  const pastedText = event.clipboardData?.getData('text')
+  if (pastedText) {
+    searchQuery.value = pastedText
+    await handleSearch()
+  }
+}
 </script>
 
 <template>
@@ -277,6 +287,8 @@ const handleBack = () => {
           placeholder="日本酒を検索..."
           class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-500 bg-white"
           @input="handleSearch"
+          @paste="handlePaste"
+          @keyup.enter="handleSearch"
         />
         <Search class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
       </div>
