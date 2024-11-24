@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import { ArrowLeft, Star, Building2, MapPin, Droplets } from 'lucide-vue-next'
@@ -33,6 +33,13 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const isFavorite = ref(false)
 const isUpdatingFavorite = ref(false)
+
+const flavorChartValue = computed(() =>
+  Object.fromEntries(
+    Object.entries(sake.value.flavor_chart)
+      .map(([k, v]) => [k, v * 5])
+  )
+)
 
 // プロフィール情報を取得
 const getCurrentProfile = async () => {
@@ -256,7 +263,7 @@ const getFlavorValue = (key: string): number => {
 
           <!-- 六角形のチャート -->
           <div class="flex justify-center mb-12">
-            <FlavorRating :values="sake.flavor_chart" :size="280" />
+            <FlavorRating :values="flavorChartValue" :size="280" />
           </div>
 
           <!-- バーチャート -->

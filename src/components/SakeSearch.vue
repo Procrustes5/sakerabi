@@ -70,7 +70,7 @@ watch(
         v-model="searchQuery"
         type="text"
         placeholder="日本酒を検索..."
-        class="w-full p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-full p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
       />
       <Search class="w-5 h-5 text-gray-400 absolute right-3 top-2.5" />
     </div>

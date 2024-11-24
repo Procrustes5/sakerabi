@@ -1,3 +1,4 @@
+<!-- FlavorChart.vue -->
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -71,97 +72,111 @@ const gridPaths = computed(() => {
   })
 })
 
-// クリックまたはドラッグでの値の更新
-const updateValue = (event: MouseEvent | TouchEvent) => {
+// スライダーでの値の更新
+const updateSliderValue = (key: keyof Props['values'], value: number) => {
   if (!props.editable) return
-
-  const svg = event.currentTarget as SVGSVGElement
-  const rect = svg.getBoundingClientRect()
-  const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
-  const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
-
-  // クリックされた座標をSVG座標系に変換
-  const x = ((clientX - rect.left) / rect.width) * 300 - CENTER_X
-  const y = ((clientY - rect.top) / rect.height) * 300 - CENTER_Y
-
-  // クリックされた角度を計算
-  let angle = Math.atan2(y, x) + Math.PI / 2
-  if (angle < 0) angle += Math.PI * 2
-
-  // クリックされた頂点のインデックスを特定
-  const index = Math.floor((angle / (Math.PI * 2)) * 6)
-
-  // クリックされた距離から値を計算（0-5の範囲に制限）
-  const distance = Math.min(Math.max(Math.sqrt(x * x + y * y) / RADIUS, 0), 1)
-  const value = Math.round(distance * 50) / 10
-
-  // 値を更新
-  const key = LABELS[index].key as keyof Props['values']
   const newValues = { ...props.values, [key]: value }
   emit('update:values', newValues)
 }
 </script>
 
 <template>
-  <div class="relative">
-    <svg
-      :width="size"
-      :height="size"
-      viewBox="0 0 300 300"
-      @mousedown="updateValue"
-      @touchstart="updateValue"
-      class="touch-none"
-      :class="{ 'cursor-pointer': editable }"
-    >
-      <!-- グリッドライン -->
-      <path
-        v-for="(gridPath, i) in gridPaths"
-        :key="i"
-        :d="gridPath"
-        fill="none"
-        stroke="#e5e7eb"
-        stroke-width="1"
-      />
+  <div class="flavor-chart">
+    <!-- グラフ表示部分 -->
+    <div class="relative">
+      <svg
+        :width="size"
+        :height="size"
+        viewBox="0 0 300 300"
+        class="touch-none"
+      >
+        <!-- グリッドライン -->
+        <path
+          v-for="(gridPath, i) in gridPaths"
+          :key="i"
+          :d="gridPath"
+          fill="none"
+          stroke="#e5e7eb"
+          stroke-width="1"
+        />
 
-      <!-- 軸線 -->
-      <line
-        v-for="(_, i) in LABELS"
-        :key="i"
-        :x1="CENTER_X"
-        :y1="CENTER_Y"
-        :x2="CENTER_X + Math.cos((Math.PI * 2 * i) / 6 - Math.PI / 2) * RADIUS"
-        :y2="CENTER_Y + Math.sin((Math.PI * 2 * i) / 6 - Math.PI / 2) * RADIUS"
-        stroke="#e5e7eb"
-        stroke-width="1"
-      />
+        <!-- 軸線 -->
+        <line
+          v-for="(_, i) in LABELS"
+          :key="i"
+          :x1="CENTER_X"
+          :y1="CENTER_Y"
+          :x2="CENTER_X + Math.cos((Math.PI * 2 * i) / 6 - Math.PI / 2) * RADIUS"
+          :y2="CENTER_Y + Math.sin((Math.PI * 2 * i) / 6 - Math.PI / 2) * RADIUS"
+          stroke="#e5e7eb"
+          stroke-width="1"
+        />
 
-      <!-- フレーバーチャート本体 -->
-      <path :d="path" fill="rgba(99, 102, 241, 0.2)" stroke="rgb(99, 102, 241)" stroke-width="2" />
+        <!-- フレーバーチャート本体 -->
+        <path :d="path" fill="rgba(99, 102, 241, 0.2)" stroke="rgb(99, 102, 241)" stroke-width="2" />
 
-      <!-- 頂点 -->
-      <circle
-        v-for="(point, i) in points"
-        :key="i"
-        :cx="point.x"
-        :cy="point.y"
-        r="4"
-        fill="white"
-        stroke="rgb(99, 102, 241)"
-        stroke-width="2"
-      />
-    </svg>
+        <!-- 頂点 -->
+        <circle
+          v-for="(point, i) in points"
+          :key="i"
+          :cx="point.x"
+          :cy="point.y"
+          r="4"
+          fill="white"
+          stroke="rgb(99, 102, 241)"
+          stroke-width="2"
+        />
+      </svg>
 
-    <!-- ラベル -->
-    <div
-      v-for="(label, i) in LABELS"
-      :key="label.key"
-      class="absolute transform -translate-x-1/2 -translate-y-1/2 text-sm text-gray-600"
-      :style="{
-        left: `${CENTER_X + Math.cos((Math.PI * 2 * i) / 6 - Math.PI / 2) * (RADIUS + 25)}px`,
-        top: `${CENTER_Y + Math.sin((Math.PI * 2 * i) / 6 - Math.PI / 2) * (RADIUS + 25)}px`,
-      }"
-    >
-      {{ label.label }}
+      <!-- ラベル -->
+      <div
+        v-for="(label, i) in LABELS"
+        :key="label.key"
+        class="absolute transform -translate-x-1/2 -translate-y-1/2 text-sm text-gray-600"
+        :style="{
+          left: `${CENTER_X + Math.cos((Math.PI * 2 * i) / 6 - Math.PI / 2) * (RADIUS + 25)}px`,
+          top: `${CENTER_Y + Math.sin((Math.PI * 2 * i) / 6 - Math.PI / 2) * (RADIUS + 25)}px`,
+        }"
+      >
+        {{ label.label }}
+      </div>
+    </div>
+
+    <!-- スライダーコントロール部分 -->
+    <div class="sliders-container mt-8" v-if="editable">
+      <div v-for="label in LABELS" :key="label.key" class="slider-item mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-500">{{ label.label }}</span>
+          <span class="text-sm text-gray-500">{{ values[label.key as keyof Props['values']] }}</span>
+        </div>
+        <input
+          type="range"
+          :value="values[label.key as keyof Props['values']]"
+          min="0"
+          max="5"
+          step="0.1"
+          @input="(e) => updateSliderValue(label.key as keyof Props['values'], parseFloat((e.target as HTMLInputElement).value))"
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        />
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.flavor-chart {
+  @apply max-w-xl mx-auto p-4;
+}
+
+.slider-item input[type="range"] {
+  @apply accent-indigo-600;
+}
+
+.slider-item input[type="range"]::-webkit-slider-thumb {
+  @apply w-4 h-4 appearance-none bg-indigo-600 rounded-full cursor-pointer;
+}
+
+.slider-item input[type="range"]::-moz-range-thumb {
+  @apply w-4 h-4 bg-indigo-600 border-none rounded-full cursor-pointer;
+}
+</style>
