@@ -22,6 +22,7 @@ interface Review {
   }
   event_brand: {
     id: number
+    brandId: string
     event: {
       name: string
       date: string
@@ -374,6 +375,7 @@ defineExpose({
               userImage: review.profile.avatar_url,
               userName: review.profile.display_name,
               timestamp: formatTimestamp(review.created_at),
+              sakeId: review.event_brand.brandId,
               rating: calculateRating(review),
               content: review.comment,
               image: review.image_url,
@@ -387,6 +389,7 @@ defineExpose({
                     location: review.event_brand.event.location,
                   }
                 : null,
+              profileId: review.profile.id,
             }"
             class="review-card"
             :class="{ 'last-review': index === reviews.length - 1 }"

@@ -16,6 +16,7 @@ interface Review {
   event_brand: {
     id: number
     brand: {
+      id: string
       name: string
     }
     event: {
