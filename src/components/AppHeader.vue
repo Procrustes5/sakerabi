@@ -91,7 +91,7 @@ const handleClick = () => {
     class="sticky top-0 z-40 transition-all duration-300"
     :class="[isScrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm' : 'bg-transparent']"
   >
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- ロゴ部分 -->
         <div class="flex items-center space-x-2 cursor-pointer" @click="handleClick">
@@ -139,7 +139,11 @@ const handleClick = () => {
     <!-- 検索モーダル -->
     <SakeSearchModal
       :is-open="isSearchModalOpen"
-      :on-close="() => { isSearchModalOpen = false }"
+      :on-close="
+        () => {
+          isSearchModalOpen = false
+        }
+      "
     />
   </header>
   <Transition
@@ -185,7 +189,10 @@ const handleClick = () => {
               <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
             </div>
 
-            <div v-else-if="notifications.length === 0" class="flex flex-col items-center justify-center py-12">
+            <div
+              v-else-if="notifications.length === 0"
+              class="flex flex-col items-center justify-center py-12"
+            >
               <Bell class="w-12 h-12 text-indigo-300 mb-4" />
               <p class="text-gray-500">通知はありません</p>
             </div>

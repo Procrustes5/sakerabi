@@ -159,9 +159,7 @@ onMounted(() => {
                 <Heart class="w-5 h-5 text-gray-600" />
                 <div>
                   <p class="text-sm font-medium text-gray-900">いいね</p>
-                  <p class="text-xs text-gray-500">
-                    投稿がいいねされたときに通知を受け取ります
-                  </p>
+                  <p class="text-xs text-gray-500">投稿がいいねされたときに通知を受け取ります</p>
                 </div>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">

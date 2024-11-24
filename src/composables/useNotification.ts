@@ -43,7 +43,8 @@ export function useNotification() {
 
       const { data, error: fetchError } = await supabase
         .from('notifications')
-        .select(`
+        .select(
+          `
           id,
           type,
           actor:profiles!actor_id(
@@ -55,7 +56,8 @@ export function useNotification() {
           comment_id,
           is_read,
           created_at
-        `)
+        `,
+        )
         .eq('profile_id', userData.user.id)
         .order('created_at', { ascending: false })
         .limit(limit)
@@ -108,7 +110,7 @@ export function useNotification() {
       } else {
         // 全ての通知を既読に
         await supabase.rpc('batch_mark_notifications_as_read', {
-          profile_id: userData.user.id
+          profile_id: userData.user.id,
         })
       }
 
@@ -194,7 +196,8 @@ export function useNotification() {
           // 新しい通知を配列の先頭に追加
           const { data, error } = await supabase
             .from('notifications')
-            .select(`
+            .select(
+              `
               id,
               type,
               actor:profiles!actor_id(
@@ -206,7 +209,8 @@ export function useNotification() {
               comment_id,
               is_read,
               created_at
-            `)
+            `,
+            )
             .eq('id', payload.new.id)
             .single()
 

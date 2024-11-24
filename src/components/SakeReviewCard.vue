@@ -66,7 +66,8 @@ const fetchComments = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_rating_comments')
-      .select(`
+      .select(
+        `
         id,
         profile_id,
         rating_id,
@@ -77,7 +78,8 @@ const fetchComments = async () => {
           display_name,
           avatar_url
         )
-      `)
+      `,
+      )
       .eq('rating_id', props.review.id)
       .order('created_at', { ascending: true })
 
@@ -94,7 +96,10 @@ const fetchComments = async () => {
 // 現在のユーザー情報の取得
 const fetchCurrentUser = async () => {
   try {
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
     if (userError) throw userError
     currentUser.value = user
   } catch (e) {
@@ -136,8 +141,8 @@ const submitComment = async () => {
     if (commentData) {
       await notifyOnComment(
         Number(props.review.id), // rating_id
-        commentData.id,          // comment_id
-        currentUser.value.id     // actor_id
+        commentData.id, // comment_id
+        currentUser.value.id, // actor_id
       )
     }
 
@@ -195,7 +200,9 @@ const formatTimestamp = (timestamp: string): string => {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+  <div
+    class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
+  >
     <!-- メインのレビューカード部分 -->
     <div class="p-4">
       <!-- ユーザー情報 -->
@@ -250,7 +257,7 @@ const formatTimestamp = (timestamp: string): string => {
           <Heart
             :class="[
               'w-5 h-5 transition-colors',
-              review.isLiked ? 'fill-current' : 'group-hover:text-red-500'
+              review.isLiked ? 'fill-current' : 'group-hover:text-red-500',
             ]"
           />
           <span class="text-sm text-gray-500 group-hover:text-gray-700">
@@ -258,13 +265,8 @@ const formatTimestamp = (timestamp: string): string => {
           </span>
         </button>
 
-        <button
-          @click="toggleComments"
-          class="flex items-center space-x-2 group"
-        >
-          <MessageCircle
-            class="w-5 h-5 text-gray-400 group-hover:text-blue-500"
-          />
+        <button @click="toggleComments" class="flex items-center space-x-2 group">
+          <MessageCircle class="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
           <span class="text-sm text-gray-500 group-hover:text-gray-700">
             {{ review.comments }}
           </span>
@@ -294,11 +296,7 @@ const formatTimestamp = (timestamp: string): string => {
           まだコメントはありません
         </div>
 
-        <div
-          v-for="comment in comments"
-          :key="comment.id"
-          class="flex space-x-3"
-        >
+        <div v-for="comment in comments" :key="comment.id" class="flex space-x-3">
           <img
             :src="comment.profile.avatar_url"
             :alt="comment.profile.display_name"
@@ -308,12 +306,12 @@ const formatTimestamp = (timestamp: string): string => {
           <div class="flex-1">
             <div class="bg-white rounded-lg p-3 shadow-sm">
               <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-gray-900">
-              {{ comment.profile.display_name }}
-            </span>
+                <span class="font-medium text-gray-900">
+                  {{ comment.profile.display_name }}
+                </span>
                 <span class="text-xs text-gray-500">
-              {{ formatTimestamp(comment.created_at) }}
-            </span>
+                  {{ formatTimestamp(comment.created_at) }}
+                </span>
               </div>
               <p class="text-gray-700">{{ comment.content }}</p>
             </div>
@@ -336,27 +334,21 @@ const formatTimestamp = (timestamp: string): string => {
         </div>
         <div v-else class="flex items-end space-x-2">
           <div class="flex-1 h-full">
-        <textarea
-          v-model="newComment"
-          rows="2"
-          class="w-full h-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
-          placeholder="コメントを入力..."
-          :disabled="isSubmitting"
-        />
+            <textarea
+              v-model="newComment"
+              rows="2"
+              class="w-full h-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
+              placeholder="コメントを入力..."
+              :disabled="isSubmitting"
+            />
           </div>
           <button
             @click="submitComment"
             :disabled="!newComment.trim() || isSubmitting"
             class="mb-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Loader2
-              v-if="isSubmitting"
-              class="w-5 h-5 animate-spin"
-            />
-            <Send
-              v-else
-              class="w-5 h-5"
-            />
+            <Loader2 v-if="isSubmitting" class="w-5 h-5 animate-spin" />
+            <Send v-else class="w-5 h-5" />
           </button>
         </div>
       </div>

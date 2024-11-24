@@ -45,14 +45,19 @@ const setupObserver = () => {
   observer = new IntersectionObserver(
     async (entries) => {
       const target = entries[0]
-      if (target.isIntersecting && !isFetching.value && hasMore.value && !searchQuery.value.trim()) {
+      if (
+        target.isIntersecting &&
+        !isFetching.value &&
+        hasMore.value &&
+        !searchQuery.value.trim()
+      ) {
         await loadMore()
       }
     },
     {
       rootMargin: '200px',
-      threshold: 0
-    }
+      threshold: 0,
+    },
   )
 
   if (observerTarget.value) {
@@ -171,8 +176,8 @@ const loadMore = async () => {
     if (error) throw error
 
     if (data) {
-      const existingIds = new Set(sakeList.value.map(item => item.id))
-      const newItems = data.filter(item => !existingIds.has(item.id))
+      const existingIds = new Set(sakeList.value.map((item) => item.id))
+      const newItems = data.filter((item) => !existingIds.has(item.id))
 
       if (newItems.length > 0) {
         sakeList.value = [...sakeList.value, ...newItems]

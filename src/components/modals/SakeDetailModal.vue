@@ -95,12 +95,13 @@ const fetchExistingRating = async () => {
 
     if (eventBrandsError) throw eventBrandsError
 
-    const eventBrandIds = eventBrands?.map(eb => eb.id) || []
+    const eventBrandIds = eventBrands?.map((eb) => eb.id) || []
 
     if (eventBrandIds.length > 0) {
       const { data, error } = await supabase
         .from('sake_flavor_ratings')
-        .select(`
+        .select(
+          `
           *,
           event_brand:event_brands(
             id,
@@ -111,7 +112,8 @@ const fetchExistingRating = async () => {
               location
             )
           )
-        `)
+        `,
+        )
         .eq('profile_id', userData.user.id)
         .in('event_brand_id', eventBrandIds)
         .single()
@@ -355,7 +357,7 @@ watch(
       // イベントリスナーを削除
       document.removeEventListener('click', closeEventSelector)
     }
-  }
+  },
 )
 
 // コンポーネントのアンマウント時にイベントリスナーを削除
@@ -370,7 +372,9 @@ onUnmounted(() => {
     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50 overflow-y-auto"
     @click.self="$emit('close')"
   >
-    <div class="bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+    <div
+      class="bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto"
+    >
       <!-- ヘッダー -->
       <div class="sticky top-0 bg-white px-6 py-4 border-b">
         <h3 class="text-xl font-bold text-gray-900">{{ brandName }}</h3>
@@ -421,7 +425,12 @@ onUnmounted(() => {
                     :key="event.id"
                     type="button"
                     class="w-full px-3 py-2 text-left rounded-md hover:bg-gray-100 transition-colors"
-                    @click="() => { selectedEvent = event; showEventSelector = false }"
+                    @click="
+                      () => {
+                        selectedEvent = event
+                        showEventSelector = false
+                      }
+                    "
                   >
                     <div class="text-gray-900">{{ event.name }}</div>
                     <div class="text-sm text-gray-500 flex items-center gap-2">

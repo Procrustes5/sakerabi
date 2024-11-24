@@ -92,7 +92,7 @@ const checkUserReview = async () => {
       return false
     }
 
-    const eventBrandIds = eventBrandData.map(eb => eb.id)
+    const eventBrandIds = eventBrandData.map((eb) => eb.id)
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
@@ -128,7 +128,8 @@ const fetchInitialReviews = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(`
+      .select(
+        `
         id,
         profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands!inner(
@@ -147,7 +148,8 @@ const fetchInitialReviews = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `)
+      `,
+      )
       .eq('event_brand.brand_id', props.brandId)
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE)
@@ -208,12 +210,10 @@ const toggleLike = async (reviewId: string) => {
 
       if (deleteError) throw deleteError
     } else {
-      const { error: insertError } = await supabase
-        .from('sake_rating_likes')
-        .insert({
-          profile_id: userData.user.id,
-          rating_id: reviewId,
-        })
+      const { error: insertError } = await supabase.from('sake_rating_likes').insert({
+        profile_id: userData.user.id,
+        rating_id: reviewId,
+      })
 
       if (insertError) throw insertError
     }
@@ -249,7 +249,8 @@ const loadMore = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(`
+      .select(
+        `
         id,
         profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands!inner(
@@ -268,7 +269,8 @@ const loadMore = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `)
+      `,
+      )
       .eq('event_brand.brand_id', props.brandId)
       .order('created_at', { ascending: false })
       .lt('created_at', lastReview.created_at)
@@ -325,7 +327,7 @@ onMounted(() => {
 })
 
 defineExpose({
-  refresh: fetchInitialReviews
+  refresh: fetchInitialReviews,
 })
 </script>
 
@@ -350,9 +352,7 @@ defineExpose({
 
       <!-- 評価がない場合のメッセージ -->
       <div v-if="!hasUserReview" class="text-center py-8">
-        <p class="text-gray-500 mb-2">
-          まだこの日本酒の評価をしていません
-        </p>
+        <p class="text-gray-500 mb-2">まだこの日本酒の評価をしていません</p>
         <p class="text-sm text-gray-400">
           他のユーザーの評価を見るには、まずあなたの評価を投稿してください
         </p>

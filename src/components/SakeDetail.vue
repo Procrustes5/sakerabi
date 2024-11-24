@@ -59,10 +59,7 @@ const handleRatingSubmit = () => {
 
 const flavorChartValue = computed(() => {
   if (!sake.value?.flavor_chart) return {}
-  return Object.fromEntries(
-    Object.entries(sake.value.flavor_chart)
-      .map(([k, v]) => [k, v * 5])
-  )
+  return Object.fromEntries(Object.entries(sake.value.flavor_chart).map(([k, v]) => [k, v * 5]))
 })
 
 // プロフィール情報を取得

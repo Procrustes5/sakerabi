@@ -78,7 +78,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-full recommend aspect-square overflow-hidden rounded-xl shadow-sm bg-white relative">
+  <div
+    class="w-full recommend aspect-square overflow-hidden rounded-xl shadow-sm bg-white relative"
+  >
     <LoadingSpinner v-if="isLoading" />
 
     <ErrorDisplay v-else-if="loadError" :message="loadError" :onRetry="retryLoad" />

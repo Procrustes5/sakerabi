@@ -9,12 +9,12 @@ interface CreateNotificationParams {
 }
 
 export async function createNotification({
-                                           profileId,
-                                           type,
-                                           actorId,
-                                           ratingId,
-                                           commentId,
-                                         }: CreateNotificationParams) {
+  profileId,
+  type,
+  actorId,
+  ratingId,
+  commentId,
+}: CreateNotificationParams) {
   try {
     // 自分自身への通知は作成しない
     if (profileId === actorId) return
@@ -77,23 +77,12 @@ export async function notifyOnLike(ratingId: number, actorId: string) {
 }
 
 // コメント時の通知
-export async function notifyOnComment(
-  ratingId: number,
-  commentId: string,
-  actorId: string,
-) {
+export async function notifyOnComment(ratingId: number, commentId: string, actorId: string) {
   try {
     // 評価の投稿者とコメントしているユーザーを取得
     const [{ data: rating }, { data: comments }] = await Promise.all([
-      supabase
-        .from('sake_flavor_ratings')
-        .select('profile_id')
-        .eq('id', ratingId)
-        .single(),
-      supabase
-        .from('sake_rating_comments')
-        .select('profile_id')
-        .eq('rating_id', ratingId),
+      supabase.from('sake_flavor_ratings').select('profile_id').eq('id', ratingId).single(),
+      supabase.from('sake_rating_comments').select('profile_id').eq('rating_id', ratingId),
     ])
 
     if (rating) {

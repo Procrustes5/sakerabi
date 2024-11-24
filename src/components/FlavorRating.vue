@@ -84,12 +84,7 @@ const updateSliderValue = (key: keyof Props['values'], value: number) => {
   <div class="flavor-chart">
     <!-- グラフ表示部分 -->
     <div class="relative">
-      <svg
-        :width="size"
-        :height="size"
-        viewBox="0 0 300 300"
-        class="touch-none"
-      >
+      <svg :width="size" :height="size" viewBox="0 0 300 300" class="touch-none">
         <!-- グリッドライン -->
         <path
           v-for="(gridPath, i) in gridPaths"
@@ -113,7 +108,12 @@ const updateSliderValue = (key: keyof Props['values'], value: number) => {
         />
 
         <!-- フレーバーチャート本体 -->
-        <path :d="path" fill="rgba(99, 102, 241, 0.2)" stroke="rgb(99, 102, 241)" stroke-width="2" />
+        <path
+          :d="path"
+          fill="rgba(99, 102, 241, 0.2)"
+          stroke="rgb(99, 102, 241)"
+          stroke-width="2"
+        />
 
         <!-- 頂点 -->
         <circle
@@ -147,7 +147,9 @@ const updateSliderValue = (key: keyof Props['values'], value: number) => {
       <div v-for="label in LABELS" :key="label.key" class="slider-item mb-4">
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-medium text-gray-500">{{ label.label }}</span>
-          <span class="text-sm text-gray-500">{{ values[label.key as keyof Props['values']] }}</span>
+          <span class="text-sm text-gray-500">{{
+            values[label.key as keyof Props['values']]
+          }}</span>
         </div>
         <input
           type="range"
@@ -155,7 +157,13 @@ const updateSliderValue = (key: keyof Props['values'], value: number) => {
           min="0"
           max="5"
           step="0.1"
-          @input="(e) => updateSliderValue(label.key as keyof Props['values'], parseFloat((e.target as HTMLInputElement).value))"
+          @input="
+            (e) =>
+              updateSliderValue(
+                label.key as keyof Props['values'],
+                parseFloat((e.target as HTMLInputElement).value),
+              )
+          "
           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         />
       </div>
@@ -168,15 +176,15 @@ const updateSliderValue = (key: keyof Props['values'], value: number) => {
   @apply max-w-xl mx-auto p-4;
 }
 
-.slider-item input[type="range"] {
+.slider-item input[type='range'] {
   @apply accent-indigo-600;
 }
 
-.slider-item input[type="range"]::-webkit-slider-thumb {
+.slider-item input[type='range']::-webkit-slider-thumb {
   @apply w-4 h-4 appearance-none bg-indigo-600 rounded-full cursor-pointer;
 }
 
-.slider-item input[type="range"]::-moz-range-thumb {
+.slider-item input[type='range']::-moz-range-thumb {
   @apply w-4 h-4 bg-indigo-600 border-none rounded-full cursor-pointer;
 }
 </style>

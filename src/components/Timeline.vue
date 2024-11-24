@@ -74,7 +74,8 @@ const fetchInitialReviews = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(`
+      .select(
+        `
         id,
         profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands(
@@ -93,7 +94,8 @@ const fetchInitialReviews = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `)
+      `,
+      )
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE)
 
@@ -138,7 +140,8 @@ const loadMore = async () => {
 
     const { data, error: fetchError } = await supabase
       .from('sake_flavor_ratings')
-      .select(`
+      .select(
+        `
         id,
         profile:profiles(id, display_name, avatar_url),
         event_brand:event_brands(
@@ -157,7 +160,8 @@ const loadMore = async () => {
         f6_keiikai,
         likes_count,
         comments_count
-      `)
+      `,
+      )
       .order('created_at', { ascending: false })
       .lt('created_at', lastReview.created_at)
       .limit(PAGE_SIZE)
@@ -230,12 +234,10 @@ const toggleLike = async (reviewId: string) => {
 
       if (deleteError) throw deleteError
     } else {
-      const { error: insertError } = await supabase
-        .from('sake_rating_likes')
-        .insert({
-          profile_id: userData.user.id,
-          rating_id: reviewId,
-        })
+      const { error: insertError } = await supabase.from('sake_rating_likes').insert({
+        profile_id: userData.user.id,
+        rating_id: reviewId,
+      })
 
       if (insertError) throw insertError
     }
@@ -322,9 +324,7 @@ onMounted(() => {
       </template>
 
       <!-- 空の状態 -->
-      <div v-else-if="!isLoading" class="text-center py-8 text-gray-500">
-        まだ評価がありません
-      </div>
+      <div v-else-if="!isLoading" class="text-center py-8 text-gray-500">まだ評価がありません</div>
     </div>
 
     <!-- ローディングインジケーター -->
