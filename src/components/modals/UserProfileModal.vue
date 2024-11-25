@@ -242,25 +242,10 @@ onMounted(() => {
                         <Clock class="w-4 h-4 mr-1" />
                         {{ formatDate(rating.created_at) }}
                       </div>
-                      <div class="flex items-center mt-1">
-                        <MapPin class="w-4 h-4 mr-1" />
-                        {{ rating.event.location }}
-                      </div>
                     </div>
                   </div>
                   <ChevronRight class="w-5 h-5 text-gray-400" />
                 </div>
-
-                <p v-if="rating.content" class="mt-2 text-gray-600">
-                  {{ rating.content }}
-                </p>
-
-                <img
-                  v-if="rating.image_url"
-                  :src="rating.image_url"
-                  :alt="rating.sakeName"
-                  class="mt-2 rounded-lg w-full h-32 object-cover"
-                />
               </div>
             </div>
           </div>
