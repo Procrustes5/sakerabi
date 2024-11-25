@@ -4,16 +4,17 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from './utils/supabase'
 import ToastContainer from '@/components/ToastContainer.vue'
+import SakeSearchModal from '@/components/modals/SakeSearchModal.vue'
+import { useSearchModalStore } from '@/stores/useSearchModalStore'
 
 const router = useRouter()
+const searchModalStore = useSearchModalStore()
 
 onMounted(() => {
-  // 認証状態の変更を監視
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       router.push('/welcome')
     } else if (event === 'SIGNED_IN' && router.currentRoute.value.path === '/welcome') {
-      // welcomeページにいる場合のみホームにリダイレクト
       router.push('/')
     }
   })
@@ -23,6 +24,10 @@ onMounted(() => {
 <template>
   <RouterView />
   <ToastContainer />
+  <SakeSearchModal
+    :is-open="searchModalStore.isOpen"
+    :on-close="searchModalStore.close"
+  />
 </template>
 
 <style scoped>
@@ -73,7 +78,6 @@ nav a:first-of-type {
     text-align: left;
     margin-left: -1rem;
     font-size: 1rem;
-
     padding: 1rem 0;
     margin-top: 1rem;
   }

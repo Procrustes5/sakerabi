@@ -7,11 +7,12 @@ import { useNotification } from '@/composables/useNotification'
 import SakeSearchModal from '@/components/modals/SakeSearchModal.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
+import { useSearchModalStore } from '@/stores/useSearchModalStore'
 
 const router = useRouter()
 const isScrolled = ref(false)
-const isSearchModalOpen = ref(false)
 const isNotificationDrawerOpen = ref(false)
+const searchModalStore = useSearchModalStore()
 
 // 通知機能の使用
 const { notifications, unreadCount, markAsRead, fetchNotifications, isLoading } = useNotification()
@@ -112,7 +113,7 @@ const handleClick = () => {
         <!-- 右側のアクション -->
         <div class="flex items-center space-x-4">
           <button
-            @click="isSearchModalOpen = true"
+            @click="searchModalStore.open"
             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
           >
             <Search class="w-5 h-5 text-gray-600" />
@@ -135,16 +136,6 @@ const handleClick = () => {
         </div>
       </div>
     </div>
-
-    <!-- 検索モーダル -->
-    <SakeSearchModal
-      :is-open="isSearchModalOpen"
-      :on-close="
-        () => {
-          isSearchModalOpen = false
-        }
-      "
-    />
   </header>
   <Transition
     enter-active-class="transition ease-out duration-300"
