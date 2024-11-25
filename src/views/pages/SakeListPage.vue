@@ -319,7 +319,8 @@ const handleAddSake = () => {
 
     <!-- 検索結果なし -->
     <div v-else-if="sakeList.length === 0" class="text-center py-8 text-gray-600">
-      日本酒が見つかりませんでした
+      <LoadingSpinner v-if="isLoading" />
+      <template v-else>日本酒が見つかりませんでした</template>
     </div>
 
     <!-- 日本酒リスト -->
