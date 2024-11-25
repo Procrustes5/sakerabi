@@ -68,6 +68,11 @@ const router = createRouter({
       component: SakeDetail,
     },
     {
+      path: '/sake/add',
+      name: 'sake-add',
+      component: () => import('@/views/pages/SakeAddPage.vue'),
+    },
+    {
       path: '/recommend',
       name: 'sake-recommend',
       component: () => import('@/views/pages/SakeRecommendationPage.vue'),

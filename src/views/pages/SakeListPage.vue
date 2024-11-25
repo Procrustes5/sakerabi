@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { supabase } from '@/utils/supabase'
-import { Search, ArrowLeft, Store, MapPin } from 'lucide-vue-next'
+import { Search, ArrowLeft, Store, MapPin, Plus } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ErrorDisplay from '@/components/ErrorDisplay.vue'
@@ -269,6 +269,10 @@ const handlePaste = async (event: ClipboardEvent) => {
     await handleSearch()
   }
 }
+
+const handleAddSake = () => {
+  router.push('/sake/add')
+}
 </script>
 
 <template>
@@ -276,11 +280,22 @@ const handlePaste = async (event: ClipboardEvent) => {
     <AppHeader />
 
     <!-- ヘッダー部分 -->
-    <div class="flex items-center mb-6 px-4 space-x-4">
-      <button @click="handleBack" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-        <ArrowLeft class="w-6 h-6 text-gray-600" />
+    <div class="flex items-center justify-between mb-6 px-4">
+      <div class="flex items-center space-x-4">
+        <button @click="handleBack" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <ArrowLeft class="w-6 h-6 text-gray-600" />
+        </button>
+        <h1 class="text-2xl font-bold text-gray-900">日本酒リスト</h1>
+      </div>
+
+      <!-- 追加された日本酒追加ボタン -->
+      <button
+        @click="handleAddSake"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-indigo-700 transition-colors shadow-sm"
+      >
+        <Plus class="w-5 h-5" />
+        <span class="hidden sm:inline">追加</span>
       </button>
-      <h1 class="text-2xl font-bold text-gray-900">日本酒リスト</h1>
     </div>
 
     <!-- 検索欄 -->
