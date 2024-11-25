@@ -82,9 +82,7 @@ const fetchBreweries = async () => {
 const filteredBreweries = computed(() => {
   if (!brewerySearchQuery.value) return breweries.value
   const query = brewerySearchQuery.value.toLowerCase()
-  return breweries.value.filter(brewery =>
-    brewery.name.toLowerCase().includes(query)
-  )
+  return breweries.value.filter((brewery) => brewery.name.toLowerCase().includes(query))
 })
 
 // 新しい酒造の追加
@@ -101,8 +99,8 @@ const addNewBrewery = async () => {
       .insert([
         {
           name: newBreweryName.value.trim(),
-          area_id: selectedAreaId.value
-        }
+          area_id: selectedAreaId.value,
+        },
       ])
       .select()
       .single()
@@ -160,8 +158,8 @@ const handleSubmit = async () => {
       .insert([
         {
           name: sakeName.value.trim(),
-          brewery_id: selectedBrewery.value?.id
-        }
+          brewery_id: selectedBrewery.value?.id,
+        },
       ])
       .select()
 
@@ -247,20 +245,14 @@ fetchAreas()
 
           <!-- 地域選択 -->
           <div class="space-y-2">
-            <label for="area" class="block text-sm font-medium text-gray-700">
-              地域を選択 *
-            </label>
+            <label for="area" class="block text-sm font-medium text-gray-700"> 地域を選択 * </label>
             <select
               id="area"
               v-model="selectedAreaId"
               class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 transition-all duration-200 bg-white"
             >
               <option value="" disabled selected>地域を選択してください</option>
-              <option
-                v-for="area in areas"
-                :key="area.id"
-                :value="area.id"
-              >
+              <option v-for="area in areas" :key="area.id" :value="area.id">
                 {{ area.name }}
               </option>
             </select>
@@ -269,9 +261,7 @@ fetchAreas()
           <!-- 酒造検索 -->
           <div v-if="selectedAreaId" class="space-y-4">
             <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">
-                酒造を検索 *
-              </label>
+              <label class="block text-sm font-medium text-gray-700"> 酒造を検索 * </label>
               <div class="relative">
                 <input
                   v-model="brewerySearchQuery"
@@ -280,7 +270,9 @@ fetchAreas()
                   class="w-full px-4 py-3 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 transition-all duration-200"
                   :class="{ 'border-red-300 ring-2 ring-red-200': breweryError }"
                 />
-                <Search class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <Search
+                  class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                />
               </div>
             </div>
 
@@ -298,29 +290,33 @@ fetchAreas()
                   :class="[
                     selectedBrewery?.id === brewery.id
                       ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-white ring-1 ring-indigo-500'
-                      : 'border-gray-100 hover:border-gray-200 bg-white'
+                      : 'border-gray-100 hover:border-gray-200 bg-white',
                   ]"
                 >
                   <div class="flex items-start space-x-3">
                     <div class="flex-grow">
                       <h3
                         class="text-base font-medium transition-colors"
-                        :class="selectedBrewery?.id === brewery.id ? 'text-indigo-900' : 'text-gray-900'"
+                        :class="
+                          selectedBrewery?.id === brewery.id ? 'text-indigo-900' : 'text-gray-900'
+                        "
                       >
                         {{ brewery.name.length ? brewery.name : '酒造なし' }}
                       </h3>
                       <div class="flex items-center space-x-2 mt-1">
                         <MapPin class="w-4 h-4 text-gray-400" />
                         <p class="text-sm text-gray-500">
-                          {{ areas.find(area => area.id === brewery.area_id)?.name }}
+                          {{ areas.find((area) => area.id === brewery.area_id)?.name }}
                         </p>
                       </div>
                     </div>
                     <div
                       class="flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200"
-                      :class="selectedBrewery?.id === brewery.id
-                        ? 'border-indigo-500 bg-indigo-500'
-                        : 'border-gray-300 group-hover:border-gray-400'"
+                      :class="
+                        selectedBrewery?.id === brewery.id
+                          ? 'border-indigo-500 bg-indigo-500'
+                          : 'border-gray-300 group-hover:border-gray-400'
+                      "
                     >
                       <svg
                         v-if="selectedBrewery?.id === brewery.id"
@@ -343,12 +339,12 @@ fetchAreas()
                   v-if="filteredBreweries.length === 0"
                   class="text-center py-8 px-4 rounded-xl border border-gray-100 bg-gray-50"
                 >
-                  <div class="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                  <div
+                    class="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4"
+                  >
                     <Search class="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 class="text-base font-medium text-gray-900 mb-1">
-                    酒造が見つかりません
-                  </h3>
+                  <h3 class="text-base font-medium text-gray-900 mb-1">酒造が見つかりません</h3>
                   <p class="text-sm text-gray-500">
                     新しい酒造を追加するか、検索条件を変更してください
                   </p>
@@ -375,7 +371,10 @@ fetchAreas()
                 leave-from-class="opacity-100 transform translate-y-0"
                 leave-to-class="opacity-0 transform -translate-y-4"
               >
-                <div v-if="showNewBreweryForm" class="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div
+                  v-if="showNewBreweryForm"
+                  class="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50"
+                >
                   <input
                     v-model="newBreweryName"
                     type="text"
@@ -405,7 +404,10 @@ fetchAreas()
             leave-from-class="opacity-100 transform translate-y-0"
             leave-to-class="opacity-0 transform -translate-y-4"
           >
-            <div v-if="errorMessage" class="bg-red-50 text-red-600 p-4 rounded-lg flex items-center">
+            <div
+              v-if="errorMessage"
+              class="bg-red-50 text-red-600 p-4 rounded-lg flex items-center"
+            >
               <AlertCircle class="w-5 h-5 mr-2 flex-shrink-0" />
               {{ errorMessage }}
             </div>
@@ -476,7 +478,8 @@ select {
 }
 
 /* モバイル用フォントサイズ調整 */
-input, select {
+input,
+select {
   font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
 }
@@ -509,7 +512,7 @@ input, select {
 }
 
 /* iOS用の入力欄スタイル調整 */
-input[type="text"],
+input[type='text'],
 select {
   -webkit-appearance: none;
   -moz-appearance: none;

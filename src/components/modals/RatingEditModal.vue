@@ -63,17 +63,14 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <Dialog
-    as="div"
-    class="relative z-50"
-    :open="modelValue"
-    @close="closeModal"
-  >
+  <Dialog as="div" class="relative z-50" :open="modelValue" @close="closeModal">
     <div class="fixed inset-0 bg-black/30" />
 
     <div class="fixed inset-0 overflow-y-auto">
       <div class="flex min-h-full items-center justify-center p-4">
-        <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <DialogPanel
+          class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+        >
           <div class="flex items-center justify-between mb-4">
             <DialogTitle as="h3" class="text-lg font-medium text-gray-900">
               レビューを編集
@@ -93,9 +90,7 @@ const handleSubmit = async () => {
 
           <!-- 評価入力 -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              評価
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"> 評価 </label>
             <input
               v-model="rating"
               type="number"
@@ -107,9 +102,7 @@ const handleSubmit = async () => {
 
           <!-- レビュー内容入力 -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              レビュー内容
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"> レビュー内容 </label>
             <textarea
               v-model="content"
               rows="4"

@@ -24,10 +24,7 @@ onMounted(() => {
 <template>
   <RouterView />
   <ToastContainer />
-  <SakeSearchModal
-    :is-open="searchModalStore.isOpen"
-    :on-close="searchModalStore.close"
-  />
+  <SakeSearchModal :is-open="searchModalStore.isOpen" :on-close="searchModalStore.close" />
 </template>
 
 <style scoped>

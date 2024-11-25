@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
   description: 'この操作は取り消すことができません。',
   isSubmitting: false,
   confirmText: '削除する',
-  cancelText: 'キャンセル'
+  cancelText: 'キャンセル',
 })
 
 const emit = defineEmits<{

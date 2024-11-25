@@ -263,7 +263,7 @@ const deleteReview = async () => {
 const handleUpdateReview = (updatedReview: Partial<ReviewProps>) => {
   emit('update-review', {
     id: props.review.id,
-    ...updatedReview
+    ...updatedReview,
   })
   showEditModal.value = false
 }
@@ -299,7 +299,7 @@ const formatTimestamp = (timestamp: string): string => {
 const confirmDeleteComment = (comment: Comment) => {
   deleteTarget.value = {
     id: comment.id,
-    content: comment.content
+    content: comment.content,
   }
   showDeleteConfirm.value = true
 }
@@ -311,7 +311,7 @@ const handleImageError = (event: Event) => {
 }
 
 onMounted(() => {
-  getCurrentProfile();
+  getCurrentProfile()
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -361,7 +361,10 @@ onUnmounted(() => {
           >
             <div class="py-1">
               <button
-                @click="showDeleteReviewConfirm = true; closeOptions()"
+                @click="
+                  showDeleteReviewConfirm = true
+                  closeOptions()
+                "
                 class="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left"
               >
                 削除
@@ -519,9 +522,6 @@ onUnmounted(() => {
     />
 
     <!-- プロフィールモーダル -->
-    <UserProfileModal
-      v-model="showProfileModal"
-      :profile-id="review.profileId"
-    />
+    <UserProfileModal v-model="showProfileModal" :profile-id="review.profileId" />
   </div>
 </template>

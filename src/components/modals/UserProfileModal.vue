@@ -57,7 +57,8 @@ const fetchUserRatings = async () => {
   try {
     const { data, error: ratingsError } = await supabase
       .from('sake_flavor_ratings')
-      .select(`
+      .select(
+        `
         id,
         comment,
         created_at,
@@ -73,7 +74,8 @@ const fetchUserRatings = async () => {
             name
           )
         )
-      `)
+      `,
+      )
       .eq('profile_id', props.profileId)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -81,19 +83,20 @@ const fetchUserRatings = async () => {
     if (ratingsError) throw ratingsError
 
     // データの整形を修正
-    userRatings.value = data?.map(rating => ({
-      id: rating.id,
-      sakeName: rating.event_brand?.brand?.name || '不明',
-      sakeId: rating.event_brand?.brand?.id,
-      content: rating.comment || '',
-      created_at: rating.created_at,
-      image_url: rating.image_url,
-      event: {
-        name: rating.event_brand?.event?.name || '不明',
-        location: rating.event_brand?.event?.location || '不明',
-        date: rating.event_brand?.event?.date || ''
-      }
-    })) || []
+    userRatings.value =
+      data?.map((rating) => ({
+        id: rating.id,
+        sakeName: rating.event_brand?.brand?.name || '不明',
+        sakeId: rating.event_brand?.brand?.id,
+        content: rating.comment || '',
+        created_at: rating.created_at,
+        image_url: rating.image_url,
+        event: {
+          name: rating.event_brand?.event?.name || '不明',
+          location: rating.event_brand?.event?.location || '不明',
+          date: rating.event_brand?.event?.date || '',
+        },
+      })) || []
   } catch (e) {
     console.error('Error fetching ratings:', e)
     error.value = '評価履歴の取得に失敗しました'
@@ -105,10 +108,7 @@ const loadData = async () => {
   error.value = null
 
   try {
-    await Promise.all([
-      fetchUserProfile(),
-      fetchUserRatings()
-    ])
+    await Promise.all([fetchUserProfile(), fetchUserRatings()])
   } catch (e) {
     console.error('Error loading data:', e)
     error.value = 'データの読み込みに失敗しました'
@@ -118,11 +118,14 @@ const loadData = async () => {
 }
 
 // モーダルの表示状態が変更されたときにデータを再取得
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    loadData()
-  }
-})
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      loadData()
+    }
+  },
+)
 
 // 評価件数
 const ratingCount = computed(() => userRatings.value.length)
@@ -145,22 +148,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    v-if="modelValue"
-    class="fixed inset-0 z-50 overflow-y-auto"
-    @click="closeModal"
-  >
+  <div v-if="modelValue" class="fixed inset-0 z-50 overflow-y-auto" @click="closeModal">
     <!-- オーバーレイ -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
 
     <!-- モーダルコンテンツ -->
-    <div
-      class="relative min-h-screen flex items-center justify-center p-4"
-      @click.stop
-    >
-      <div
-        class="relative bg-white w-full max-w-lg rounded-xl shadow-xl overflow-hidden"
-      >
+    <div class="relative min-h-screen flex items-center justify-center p-4" @click.stop>
+      <div class="relative bg-white w-full max-w-lg rounded-xl shadow-xl overflow-hidden">
         <!-- ヘッダー -->
         <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-500">
           <button
@@ -208,9 +202,7 @@ onMounted(() => {
 
           <!-- 評価履歴 -->
           <div class="mt-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              最近の評価
-            </h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">最近の評価</h3>
 
             <div v-if="isLoading" class="space-y-4">
               <div v-for="n in 3" :key="n" class="bg-gray-50 rounded-lg p-4">
