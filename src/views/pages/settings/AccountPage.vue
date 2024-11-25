@@ -201,7 +201,7 @@ const goBack = () => {
               <button
                 @click="updateProfile"
                 :disabled="loading"
-                class="w-full py-2 px-4 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+                class="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-medium hover:from-indigo-600 hover:to-purple-700 transition-colors disabled:opacity-50"
               >
                 {{ loading ? '更新中...' : '保存する' }}
               </button>

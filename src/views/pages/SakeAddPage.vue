@@ -432,7 +432,7 @@ fetchAreas()
           <div class="pt-4">
             <button
               type="submit"
-              class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed active:bg-indigo-800"
+              class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed active:bg-indigo-800"
               :disabled="isLoading"
             >
               <LoadingSpinner v-if="isLoading" class="w-5 h-5" />

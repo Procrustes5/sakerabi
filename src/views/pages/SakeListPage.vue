@@ -288,13 +288,13 @@ const handleAddSake = () => {
         <h1 class="text-2xl font-bold text-gray-900">日本酒リスト</h1>
       </div>
 
-      <!-- 追加された日本酒追加ボタン -->
+      <!-- 日本酒追加ボタン -->
       <button
         @click="handleAddSake"
-        class="bg-indigo-600 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-indigo-700 transition-colors shadow-sm"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-colors"
       >
         <Plus class="w-5 h-5" />
-        <span class="hidden sm:inline">追加</span>
+        <span>作成</span>
       </button>
     </div>
 
