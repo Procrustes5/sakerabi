@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import { Loader2, MessageSquare, Edit } from 'lucide-vue-next'
+import { Loader2, MessageSquare, Edit, Users } from 'lucide-vue-next'
 import SakeReviewCard from './SakeReviewCard.vue'
 
 const props = defineProps<{
@@ -43,11 +43,20 @@ interface Review {
   is_liked_by_me?: boolean
 }
 
+interface ReviewerStats {
+  total: number
+  recent: Review[]
+}
+
 const emit = defineEmits<{
   (e: 'addReview'): void
 }>()
 
 const reviews = ref<Review[]>([])
+const reviewerStats = ref<ReviewerStats>({
+  total: 0,
+  recent: []
+})
 const isLoading = ref(false)
 const hasMore = ref(true)
 const error = ref<string | null>(null)
@@ -72,6 +81,44 @@ const calculateRating = (review: Review): number => {
 // タイムスタンプのフォーマット
 const formatTimestamp = (timestamp: string): string => {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ja })
+}
+
+// レビュアー統計の取得
+const fetchReviewerStats = async () => {
+  try {
+    const { data: eventBrandData } = await supabase
+      .from('event_brands')
+      .select('id')
+      .eq('brand_id', props.brandId)
+
+    if (!eventBrandData) return
+
+    const eventBrandIds = eventBrandData.map((eb) => eb.id)
+
+    // 総評価数の取得
+    const { count } = await supabase
+      .from('sake_flavor_ratings')
+      .select('id', { count: 'exact' })
+      .in('event_brand_id', eventBrandIds)
+
+    // 最近の評価者の取得（最大3人）
+    const { data: recentReviews } = await supabase
+      .from('sake_flavor_ratings')
+      .select(`
+        profile:profiles(id, display_name, avatar_url),
+        created_at
+      `)
+      .in('event_brand_id', eventBrandIds)
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    reviewerStats.value = {
+      total: count || 0,
+      recent: recentReviews || []
+    }
+  } catch (e) {
+    console.error('Error fetching reviewer stats:', e)
+  }
 }
 
 // ユーザーの評価があるかチェック
@@ -105,6 +152,12 @@ const checkUserReview = async () => {
     if (fetchError) throw fetchError
 
     hasUserReview.value = data && data.length > 0
+
+    // ユーザーの評価がない場合は、レビュアー統計を取得
+    if (!hasUserReview.value) {
+      await fetchReviewerStats()
+    }
+
     return hasUserReview.value
   } catch (e) {
     console.error('Error checking user review:', e)
@@ -211,10 +264,12 @@ const toggleLike = async (reviewId: string) => {
 
       if (deleteError) throw deleteError
     } else {
-      const { error: insertError } = await supabase.from('sake_rating_likes').insert({
-        profile_id: userData.user.id,
-        rating_id: reviewId,
-      })
+      const { error: insertError } = await supabase
+        .from('sake_rating_likes')
+        .insert({
+          profile_id: userData.user.id,
+          rating_id: reviewId,
+        })
 
       if (insertError) throw insertError
     }
@@ -230,11 +285,22 @@ const toggleLike = async (reviewId: string) => {
   }
 }
 
-// Intersection Observer for infinite scroll
-const observeLastElement = (entries: IntersectionObserverEntry[]) => {
-  const lastEntry = entries[entries.length - 1]
-  if (lastEntry.isIntersecting) {
-    loadMore()
+// レビュー削除時のハンドラー
+const handleReviewDelete = async (reviewId: string) => {
+  try {
+    const { error: deleteError } = await supabase
+      .from('sake_flavor_ratings')
+      .delete()
+      .eq('id', reviewId)
+
+    if (deleteError) throw deleteError
+
+    // 画面をリロード
+    await fetchInitialReviews()
+    await checkUserReview() // ユーザーの評価状態を再チェック
+  } catch (e) {
+    error.value = '評価の削除に失敗しました'
+    console.error('Error deleting review:', e)
   }
 }
 
@@ -306,7 +372,15 @@ const loadMore = async () => {
   }
 }
 
-// 評価ボタンクリック時の処理を変更
+// Intersection Observer for infinite scroll
+const observeLastElement = (entries: IntersectionObserverEntry[]) => {
+  const lastEntry = entries[entries.length - 1]
+  if (lastEntry.isIntersecting) {
+    loadMore()
+  }
+}
+
+// 評価ボタンクリック時の処理
 const handleAddReview = () => {
   emit('addReview')
 }
@@ -335,6 +409,7 @@ defineExpose({
 <template>
   <div class="max-w-7xl mx-auto px-4">
     <div class="bg-white rounded-2xl p-6 shadow-sm">
+      <!-- ヘッダー部分 -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-2">
           <MessageSquare class="w-5 h-5 text-gray-600" />
@@ -342,9 +417,9 @@ defineExpose({
         </div>
         <!-- ログイン済みかつ評価していない場合は評価ボタンを表示 -->
         <button
-          v-if="currentUser"
+          v-if="currentUser && !hasUserReview"
           @click="handleAddReview"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-colors"
         >
           <Edit class="w-4 h-4" />
           <span>評価する</span>
@@ -352,20 +427,70 @@ defineExpose({
       </div>
 
       <!-- 評価がない場合のメッセージ -->
-      <div v-if="!hasUserReview" class="text-center py-8">
-        <p class="text-gray-500 mb-2">まだこの日本酒の評価をしていません</p>
-        <p class="text-sm text-gray-400">
-          他のユーザーの評価を見るには、まずあなたの評価を投稿してください
-        </p>
+      <div v-if="!hasUserReview" class="space-y-6">
+        <!-- レビュアー統計情報 -->
+        <div v-if="reviewerStats.total > 0" class="bg-gray-50 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <Users class="w-5 h-5 text-gray-600" />
+            <h3 class="font-medium text-gray-900">
+              {{ reviewerStats.total }}人が評価済み
+            </h3>
+          </div>
+
+          <!-- 最近の評価者アバター -->
+          <div class="flex flex-col gap-4">
+            <!-- アバター表示部分 -->
+            <div class="flex items-center -space-x-2">
+              <div
+                v-for="reviewer in reviewerStats.recent"
+                :key="reviewer.profile.id"
+                class="relative"
+              >
+                <img
+                  :src="reviewer.profile.avatar_url || '/default-avatar.png'"
+                  :alt="reviewer.profile.display_name"
+                  class="w-10 h-10 rounded-full border-2 border-white shadow-sm"
+                />
+                <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+              </div>
+            </div>
+
+            <!-- アクションメッセージ -->
+            <div class="space-y-2">
+              <p class="text-gray-600">
+                他のユーザーの評価を見るには、まずあなたの評価を投稿してください。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 評価がない場合のメッセージ -->
+        <div v-else class="text-center py-8 bg-gray-50 rounded-xl">
+          <p class="text-gray-600 mb-2">まだこの日本酒の評価はありません</p>
+          <p class="text-sm text-gray-500 mb-4">
+            最初の評価を投稿して、他のユーザーと感想を共有しましょう
+          </p>
+          <button
+            v-if="currentUser"
+            @click="handleAddReview"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Edit class="w-4 h-4" />
+            最初の評価を投稿する
+          </button>
+        </div>
       </div>
 
       <!-- エラー表示 -->
-      <div v-else-if="error" class="px-4 py-2 bg-red-100 text-red-700 rounded-md mb-4">
-        {{ error }}
+      <div
+        v-if="error"
+        class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
+      >
+        <p class="text-red-600">{{ error }}</p>
       </div>
 
       <!-- レビューリスト -->
-      <div v-else class="space-y-4">
+      <div v-if="hasUserReview" class="space-y-4">
         <template v-if="reviews.length > 0">
           <SakeReviewCard
             v-for="(review, index) in reviews"
@@ -391,31 +516,60 @@ defineExpose({
                 : null,
               profileId: review.profile.id,
             }"
-            class="review-card"
-            :class="{ 'last-review': index === reviews.length - 1 }"
+            :is-owner="review.profile.id === currentUser"
+            class="review-card transition-all duration-200 hover:shadow-md"
+            :class="{
+              'last-review': index === reviews.length - 1,
+              'border border-gray-100 rounded-xl': true
+            }"
             @toggle-like="toggleLike(review.id)"
+            @delete="handleReviewDelete(review.id)"
           />
         </template>
 
         <!-- 空の状態 -->
-        <div v-else-if="!isLoading" class="text-center py-8 text-gray-500">
-          まだ評価がありません
+        <div
+          v-else-if="!isLoading"
+          class="text-center py-8 bg-gray-50 rounded-xl"
+        >
+          <p class="text-gray-500">まだ評価がありません</p>
         </div>
       </div>
 
       <!-- ローディングインジケーター -->
-      <div v-if="isLoading" class="flex justify-center items-center py-4">
-        <Loader2 class="w-6 h-6 text-gray-600 animate-spin" />
+      <div
+        v-if="isLoading"
+        class="flex justify-center items-center py-6"
+      >
+        <div class="flex items-center gap-2">
+          <Loader2 class="w-5 h-5 text-gray-600 animate-spin" />
+          <span class="text-gray-600">読み込み中...</span>
+        </div>
       </div>
 
       <!-- さらに読み込むボタン -->
-      <div v-if="hasMore && !isLoading && reviews.length > 0" class="flex justify-center mt-4">
+      <div
+        v-if="hasMore && !isLoading && reviews.length > 0"
+        class="flex justify-center mt-6"
+      >
         <button
           @click="loadMore"
-          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
-          さらに読み込む
+          <span>さらに読み込む</span>
+          <Loader2
+            v-if="isLoading"
+            class="w-4 h-4 animate-spin"
+          />
         </button>
+      </div>
+
+      <!-- ページネーション情報 -->
+      <div
+        v-if="reviews.length > 0"
+        class="mt-4 text-center text-sm text-gray-500"
+      >
+        {{ reviews.length }}件を表示中
       </div>
     </div>
   </div>
