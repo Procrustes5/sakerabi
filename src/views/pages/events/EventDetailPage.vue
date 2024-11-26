@@ -8,7 +8,7 @@ import ErrorDisplay from '@/components/ErrorDisplay.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import SakeRatingModal from '@/components/modals/SakeRatingModal.vue'
 import SakeAddModal from '@/components/modals/SakeAddModal.vue'
-import FlavorRating from '@/components/FlavorRating.vue'
+import FlavorRating from '@/components/flavor/FlavorRating.vue'
 
 interface Event {
   id: number

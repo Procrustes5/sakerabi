@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import { ArrowLeft, Star, Building2, MapPin, Droplets } from 'lucide-vue-next'
-import FlavorRating from './FlavorRating.vue'
+import FlavorRating from './flavor/FlavorRating.vue'
 import SakeBrandReviews from './SakeBrandReviews.vue'
 import SakeDetailModal from './modals/SakeDetailModal.vue'
 

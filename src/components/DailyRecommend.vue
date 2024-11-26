@@ -3,8 +3,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useDailyRecommend } from '@/composables/useDailyRecommend'
 import LoadingSpinner from './LoadingSpinner.vue'
 import ErrorDisplay from './ErrorDisplay.vue'
-import FlavorTags from './FlavorTags.vue'
-import FlavorChart from './FlavorChart.vue'
+import FlavorTags from './flavor/FlavorTags.vue'
+import FlavorChart from './flavor/FlavorChart.vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const {

@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { Camera, X } from 'lucide-vue-next'
-import FlavorRating from '../FlavorRating.vue'
+import FlavorRating from '../flavor/FlavorRating.vue'
 
 interface Props {
   isOpen: boolean

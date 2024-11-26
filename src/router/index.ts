@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/utils/supabase'
 import HomePage from '@/views/pages/HomePage.vue'
 import WelcomePage from '@/views/pages/WelcomePage.vue'
-import EventListView from '@/views/pages/EventListPage.vue'
-import EventCreateView from '@/views/pages/EventCreatePage.vue'
+import EventListView from '@/views/pages/events/EventListPage.vue'
+import EventCreateView from '@/views/pages/events/EventCreatePage.vue'
 import SettingsPage from '@/views/pages/settings/SettingsPage.vue'
 import SecurityPage from '@/views/pages/settings/SecurityPage.vue'
 import AuthCallback from '@/components/AuthCallback.vue'
@@ -42,7 +42,7 @@ const router = createRouter({
     {
       path: '/events/:id',
       name: 'event-detail',
-      component: () => import('@/views/pages/EventDetailPage.vue'),
+      component: () => import('@/views/pages/events/EventDetailPage.vue'),
     },
     {
       path: '/events/create',
@@ -53,14 +53,14 @@ const router = createRouter({
     {
       path: '/events/:id/edit',
       name: 'event-edit',
-      component: () => import('../views/pages/EventEditPage.vue'),
+      component: () => import('../views/pages/events/EventEditPage.vue'),
       props: true,
       meta: { requiresAuth: true },
     },
     {
       path: '/sake',
       name: 'sake-list',
-      component: () => import('@/views/pages/SakeListPage.vue'),
+      component: () => import('@/views/pages/sake/SakeListPage.vue'),
     },
     {
       path: '/sake/:id',
@@ -70,17 +70,17 @@ const router = createRouter({
     {
       path: '/sake/add',
       name: 'sake-add',
-      component: () => import('@/views/pages/SakeAddPage.vue'),
+      component: () => import('@/views/pages/sake/SakeAddPage.vue'),
     },
     {
       path: '/recommend',
       name: 'sake-recommend',
-      component: () => import('@/views/pages/SakeRecommendationPage.vue'),
+      component: () => import('@/views/pages/sake/SakeRecommendationPage.vue'),
     },
     {
       path: '/favorite',
       name: 'sake-favorite',
-      component: () => import('@/views/pages/SakeFavoritePage.vue'),
+      component: () => import('@/views/pages/sake/SakeFavoritePage.vue'),
     },
     {
       path: '/settings',

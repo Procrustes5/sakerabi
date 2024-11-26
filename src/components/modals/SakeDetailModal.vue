@@ -2,7 +2,7 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { Camera, X, Calendar, ChevronDown } from 'lucide-vue-next'
-import FlavorRating from '../FlavorRating.vue'
+import FlavorRating from '../flavor/FlavorRating.vue'
 
 const emit = defineEmits<{
   (e: 'close'): void

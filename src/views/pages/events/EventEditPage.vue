@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, Trash2 } from 'lucide-vue-next'
-import LoadingSpinner from '../../components/LoadingSpinner.vue'
-import ErrorDisplay from '../../components/ErrorDisplay.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
+import ErrorDisplay from '../../../components/ErrorDisplay.vue'
 import { supabase } from '@/utils/supabase'
 import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal.vue'
 
