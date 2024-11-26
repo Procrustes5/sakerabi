@@ -17,6 +17,13 @@ const searchModalStore = useSearchModalStore()
 // 通知機能の使用
 const { notifications, unreadCount, markAsRead, fetchNotifications, isLoading } = useNotification()
 
+const formatTimestamp = (date: Date) => {
+  return formatDistanceToNow(date, {
+    addSuffix: true,
+    locale: ja
+  })
+}
+
 // 通知の種類に応じたメッセージを生成
 const getNotificationMessage = (notification: any) => {
   const actorName = notification.actor.display_name
